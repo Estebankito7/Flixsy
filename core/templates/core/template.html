@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flexsy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0f0f0f;
+        --surface: #1a1a1a;
+        --surface-hover: #242424;
+        --fg: #ececec;
+        --fg-secondary: #999999;
+        --muted: #666666;
+        --border: #2a2a2a;
+        --accent: #c8c8c8;
+        --accent-soft: color-mix(in srgb, var(--accent) 14%, transparent);
+        --accent-on: #0f0f0f;
+
+        --backdrop-gradient: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+        --ctint-steel: linear-gradient(135deg, #1e1e1e, #121212);
+        --ctint-amber: linear-gradient(135deg, #242424, #141414);
+        --ctint-green: linear-gradient(135deg, #1a1a1a, #0f0f0f);
+        --ctint-violet: linear-gradient(135deg, #222222, #131313);
+        --ctint-ocean: linear-gradient(135deg, #1c1c1c, #101010);
+        --ctint-steel2: linear-gradient(135deg, #1e1e1e, #111111);
+        --ctint-forest: linear-gradient(135deg, #1b1b1b, #0e0e0e);
+        --ctint-grey: linear-gradient(135deg, #181818, #0c0c0c);
+        --ctint-violet2: linear-gradient(135deg, #212121, #111111);
+
+        --font-display: "Inter", "Segoe UI", system-ui, sans-serif;
+        --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+        --font-mono:
+          "SF Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+        --fs-h1: clamp(28px, 3.6vw, 44px);
+        --fs-h2: 22px;
+        --fs-h3: 18px;
+        --fs-body: 15px;
+        --fs-meta: 13px;
+        --fs-small: 12px;
+        --gap-xs: 6px;
+        --gap-sm: 10px;
+        --gap-md: 16px;
+        --gap-lg: 24px;
+        --gap-xl: 36px;
+        --gap-2xl: 56px;
+        --radius-sm: 8px;
+        --radius-md: 16px;
+        --radius-lg: 20px;
+        --radius-pill: 9999px;
+        --ease-out: cubic-bezier(0.2, 0, 0, 1);
+        --motion-base: 220ms;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+        background: var(--bg);
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-body);
+        font-size: var(--fs-body);
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      img,
+      svg {
+        display: block;
+        max-width: 100%;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+        border: 0;
+        background: none;
+        padding: 0;
+        color: inherit;
+      }
+      p {
+        text-wrap: pretty;
+        margin: 0;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        text-wrap: balance;
+        margin: 0;
+      }
+
+      /* ─── Backdrop ──────────────────────────────────────────────────── */
+      .backdrop {
+        position: relative;
+        height: clamp(320px, 45vw, 560px);
+        overflow: hidden;
+      }
+      .backdrop-bg {
+        position: absolute;
+        inset: 0;
+        background: var(--backdrop-gradient);
+      }
+      .backdrop-bg::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, var(--bg) 0%, transparent 55%);
+      }
+      .backdrop-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        padding: var(--gap-2xl) var(--gap-xl);
+      }
+      .backdrop-nav {
+        position: absolute;
+        top: var(--gap-lg);
+        left: var(--gap-xl);
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: var(--gap-md);
+      }
+      .backdrop-nav a {
+        display: flex;
+        align-items: center;
+        gap: var(--gap-xs);
+        color: var(--fg-secondary);
+        font-size: 14px;
+        font-weight: 500;
+        transition: color var(--motion-base) var(--ease-out);
+      }
+      .backdrop-nav a:hover {
+        color: var(--fg);
+      }
+      .backdrop-nav a svg {
+        width: 20px;
+        height: 20px;
+      }
+      .backdrop-badge {
+        background: rgba(224, 217, 217, 0.1);
+        backdrop-filter: blur(8px);
+        border-radius: var(--radius-pill);
+        padding: 4px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg-secondary);
+      }
+
+      /* ─── Detail Layout ─────────────────────────────────────────────── */
+      .detail-wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 var(--gap-xl) var(--gap-2xl);
+        margin-top: -80px;
+        position: relative;
+        z-index: 3;
+      }
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: var(--gap-xl);
+        align-items: start;
+      }
+
+      /* ─── Poster Column ─────────────────────────────────────────────── */
+      .poster-col {
+        display: none;
+      }
+      @media (min-width: 900px) {
+        .poster-col {
+          display: block;
+        }
+      }
+      .poster-card {
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        aspect-ratio: 2 / 3;
+        background: linear-gradient(
+          135deg,
+          color-mix(in srgb, var(--surface) 80%, black),
+          color-mix(in srgb, var(--bg) 90%, var(--accent))
+        );
+      }
+
+      /* ─── Primary Column ────────────────────────────────────────────── */
+      .primary-col h1 {
+        font-size: var(--fs-h1);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.08;
+      }
+      .detail-tagline {
+        color: var(--fg-secondary);
+        font-size: 16px;
+        font-style: italic;
+        margin-top: var(--gap-xs);
+      }
+
+      /* ─── Meta Badges ───────────────────────────────────────────────── */
+      .meta-badges {
+        display: flex;
+        align-items: center;
+        gap: var(--gap-sm);
+        flex-wrap: wrap;
+        margin: var(--gap-md) 0;
+      }
+      .meta-badge {
+        background: var(--surface);
+        border-radius: var(--radius-pill);
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--fg-secondary);
+        border: 1px solid var(--border);
+      }
+      .meta-badge.rating {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--accent-soft);
+        border-color: transparent;
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .meta-badge.rating svg {
+        width: 14px;
+        height: 14px;
+        fill: var(--accent);
+      }
+      .meta-badge.year {
+        background: transparent;
+        border-color: var(--border);
+      }
+
+      /* ─── Action Buttons (stadium) ──────────────────────────────────── */
+      .detail-actions {
+        display: flex;
+        gap: var(--gap-sm);
+        margin: var(--gap-lg) 0;
+        flex-wrap: wrap;
+      }
+      .btn-stadium {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--gap-sm);
+        padding: 14px 32px;
+        border-radius: var(--radius-pill);
+        font-weight: 600;
+        font-size: 16px;
+        transition:
+          background var(--motion-base) var(--ease-out),
+          transform 0.05s ease;
+      }
+      .btn-stadium:active {
+        transform: translateY(1px);
+      }
+      .btn-stadium svg {
+        width: 20px;
+        height: 20px;
+      }
+      .btn-stadium.play {
+        background: var(--accent);
+        color: var(--accent-on);
+      }
+      .btn-stadium.play:hover {
+        background: color-mix(in srgb, var(--accent) 88%, black);
+      }
+      .btn-stadium.secondary {
+        background: rgba(224, 217, 217, 0.08);
+        color: var(--fg);
+        border: 1px solid rgba(224, 217, 217, 0.15);
+      }
+      .btn-stadium.secondary:hover {
+        background: rgba(224, 217, 217, 0.15);
+      }
+      .btn-stadium.icon-only {
+        padding: 14px;
+        border-radius: 50%;
+        background: rgba(224, 217, 217, 0.08);
+        border: 1px solid rgba(224, 217, 217, 0.15);
+      }
+      .btn-stadium.icon-only:hover {
+        background: rgba(224, 217, 217, 0.15);
+      }
+
+      /* ─── Synopsis ──────────────────────────────────────────────────── */
+      .synopsis {
+        margin: var(--gap-lg) 0 var(--gap-xl);
+      }
+      .synopsis h2 {
+        font-size: var(--fs-h2);
+        font-weight: 600;
+        margin-bottom: var(--gap-sm);
+      }
+      .synopsis p {
+        color: var(--fg-secondary);
+        font-size: 16px;
+        line-height: 1.65;
+        max-width: 65ch;
+      }
+
+      /* ─── Detail Sidebar ────────────────────────────────────────────── */
+      .detail-sidebar {
+        background: var(--surface);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        padding: var(--gap-lg);
+      }
+      .sidebar-block + .sidebar-block {
+        margin-top: var(--gap-lg);
+        padding-top: var(--gap-lg);
+        border-top: 1px solid var(--border);
+      }
+      .sidebar-block h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: var(--gap-sm);
+      }
+      .sidebar-block p,
+      .sidebar-block .tag-list {
+        color: var(--fg);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--gap-xs);
+      }
+      .tag-list span {
+        background: var(--accent-soft);
+        color: var(--accent);
+        padding: 3px 10px;
+        border-radius: var(--radius-pill);
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      /* ─── Cast Grid ─────────────────────────────────────────────────── */
+      .cast-section {
+        margin-top: var(--gap-2xl);
+      }
+      .cast-section h2 {
+        font-size: var(--fs-h2);
+        font-weight: 600;
+        margin-bottom: var(--gap-lg);
+      }
+      .cast-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: var(--gap-lg);
+      }
+      .cast-card {
+        text-align: center;
+      }
+      .cast-photo {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto var(--gap-sm);
+        background: var(--surface);
+        border: 2px solid var(--border);
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+      .cast-photo-inner {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          color-mix(in srgb, var(--surface) 80%, black),
+          var(--bg)
+        );
+      }
+      .cast-card .name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--fg);
+      }
+      .cast-card .role {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      /* ─── Similar Section ───────────────────────────────────────────── */
+      .similar-section {
+        margin-top: var(--gap-2xl);
+      }
+      .similar-section h2 {
+        font-size: var(--fs-h2);
+        font-weight: 600;
+        margin-bottom: var(--gap-lg);
+      }
+      .card-row {
+        display: flex;
+        gap: var(--gap-md);
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        scroll-behavior: smooth;
+      }
+      .card-row::-webkit-scrollbar {
+        display: none;
+      }
+      .media-card {
+        flex-shrink: 0;
+        width: 160px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        background: var(--surface);
+        transition: transform var(--motion-base) var(--ease-out);
+        cursor: pointer;
+      }
+      .media-card:hover {
+        transform: translateY(-4px);
+      }
+      .media-card a {
+        display: block;
+      }
+      .media-card-thumb {
+        aspect-ratio: 2 / 3;
+        background: linear-gradient(
+          135deg,
+          color-mix(in srgb, var(--surface) 80%, black),
+          color-mix(in srgb, var(--bg) 90%, var(--accent))
+        );
+        display: grid;
+        place-items: center;
+      }
+      .media-card-thumb .card-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(224, 217, 217, 0.1);
+        display: grid;
+        place-items: center;
+        color: var(--fg);
+        opacity: 0;
+        transition: opacity var(--motion-base) var(--ease-out);
+      }
+      .media-card-thumb .card-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+      .media-card:hover .card-icon {
+        opacity: 1;
+      }
+      .media-card-info {
+        padding: var(--gap-sm);
+      }
+      .media-card-info h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .media-card-info .meta-line {
+        display: flex;
+        align-items: center;
+        gap: var(--gap-xs);
+        font-size: var(--fs-small);
+        color: var(--muted);
+      }
+      .media-card-info .meta-line .dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--muted);
+      }
+
+      /* ─── Responsive ────────────────────────────────────────────────── */
+      @media (max-width: 900px) {
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+        .detail-wrap {
+          margin-top: -60px;
+          padding: 0 var(--gap-md) var(--gap-xl);
+        }
+        .backdrop-content {
+          padding: var(--gap-xl) var(--gap-md);
+        }
+        .backdrop-nav {
+          left: var(--gap-md);
+          top: var(--gap-md);
+        }
+        .detail-sidebar {
+          margin-top: var(--gap-lg);
+        }
+        .cast-grid {
+          grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+          gap: var(--gap-md);
+        }
+        .cast-photo {
+          width: 64px;
+          height: 64px;
+        }
+      }
+      @media (max-width: 600px) {
+        .backdrop {
+          height: 240px;
+        }
+        .detail-actions .btn-stadium {
+          flex: 1;
+          justify-content: center;
+        }
+        .btn-stadium {
+          padding: 12px 20px;
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══ Backdrop ═══ -->
+    <div class="backdrop" data-od-id="backdrop">
+      <div class="backdrop-bg"></div>
+      <div class="backdrop-nav">
+        <a href="index.html">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Back to Browse
+        </a>
+        <span class="backdrop-badge">Movie</span>
+      </div>
+      <div class="backdrop-content">
+        <div style="width: 100%">
+          <h1>Nebula Rising</h1>
+          <div class="meta-badges">
+            <span class="meta-badge year">2024</span>
+            <span class="meta-badge">2h 18m</span>
+            <span class="meta-badge rating">
+              <svg viewBox="0 0 24 24">
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                />
+              </svg>
+              8.7
+            </span>
+            <span class="meta-badge">Sci-Fi</span>
+            <span class="meta-badge">Adventure</span>
+            <span class="meta-badge">4K</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Detail Content ═══ -->
+    <div class="detail-wrap">
+      <div class="detail-grid">
+        <!-- Primary Column -->
+        <div class="primary-col">
+          <p class="detail-tagline">
+            "The edge of the unknown is where we find ourselves."
+          </p>
+
+          <!-- Actions -->
+          <div class="detail-actions">
+            <button class="btn-stadium play">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+              Play Movie
+            </button>
+            <button class="btn-stadium secondary">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polygon points="23 5 23 19 17 12 23 5" fill="currentColor" />
+                <rect x="1" y="5" width="15" height="14" rx="2" />
+              </svg>
+              Trailer
+            </button>
+            <button class="btn-stadium icon-only" aria-label="Add to My List">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+            <button class="btn-stadium icon-only" aria-label="Share">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
+                <polyline points="16 6 12 2 8 6" />
+                <line x1="12" y1="2" x2="12" y2="15" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Synopsis -->
+          <div class="synopsis">
+            <h2>Synopsis</h2>
+            <p>
+              When a mysterious signal arrives from beyond the Milky Way, a team
+              of astronauts aboard the vessel <em>Odyssey</em> embarks on
+              humanity's most ambitious mission. As they venture deeper into
+              uncharted space, the crew discovers that the signal is not a
+              message — it's a warning. Directed by Ava Chen,
+              <em>Nebula Rising</em> is a breathtaking visual journey that
+              combines hard science fiction with profound questions about
+              consciousness and connection. The film has been praised for its
+              grounded performances, stunning practical effects, and a third act
+              that redefines the space exploration genre.
+            </p>
+          </div>
+
+          <!-- Cast -->
+          <div class="cast-section" data-od-id="cast">
+            <h2>Cast</h2>
+            <div class="cast-grid">
+              <div class="cast-card">
+                <div class="cast-photo">
+                  <div class="cast-photo-inner"></div>
+                </div>
+                <div class="name">Elena Voss</div>
+                <div class="role">Commander Rayes</div>
+              </div>
+              <div class="cast-card">
+                <div class="cast-photo">
+                  <div
+                    class="cast-photo-inner"
+                    style="background: var(--ctint-steel2)"
+                  ></div>
+                </div>
+                <div class="name">David Okonkwo</div>
+                <div class="role">Dr. Patel</div>
+              </div>
+              <div class="cast-card">
+                <div class="cast-photo">
+                  <div
+                    class="cast-photo-inner"
+                    style="background: var(--ctint-violet2)"
+                  ></div>
+                </div>
+                <div class="name">Sarah Kim</div>
+                <div class="role">Lt. Harlow</div>
+              </div>
+              <div class="cast-card">
+                <div class="cast-photo">
+                  <div
+                    class="cast-photo-inner"
+                    style="background: var(--ctint-forest)"
+                  ></div>
+                </div>
+                <div class="name">James Corrigan</div>
+                <div class="role">Chief Yu</div>
+              </div>
+              <div class="cast-card">
+                <div class="cast-photo">
+                  <div
+                    class="cast-photo-inner"
+                    style="background: var(--ctint-amber)"
+                  ></div>
+                </div>
+                <div class="name">Priya Nair</div>
+                <div class="role">Dr. Weiss</div>
+              </div>
+              <div class="cast-card">
+                <div class="cast-photo">
+                  <div
+                    class="cast-photo-inner"
+                    style="background: var(--ctint-grey)"
+                  ></div>
+                </div>
+                <div class="name">Marcus Bell</div>
+                <div class="role">Tech Ops</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Similar -->
+          <div class="similar-section" data-od-id="similar">
+            <h2>More Like This</h2>
+            <div class="card-row">
+              <div class="media-card">
+                <a href="#">
+                  <div
+                    class="media-card-thumb"
+                    style="background: var(--ctint-steel)"
+                  >
+                    <div class="card-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="media-card-info">
+                    <h3>Midnight Signal</h3>
+                    <div class="meta-line">
+                      <span>2024</span><span class="dot"></span
+                      ><span>Sci-Fi</span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="media-card">
+                <a href="#">
+                  <div
+                    class="media-card-thumb"
+                    style="background: var(--ctint-green)"
+                  >
+                    <div class="card-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="media-card-info">
+                    <h3>Carbon Frontier</h3>
+                    <div class="meta-line">
+                      <span>2023</span><span class="dot"></span
+                      ><span>Action</span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="media-card">
+                <a href="#">
+                  <div
+                    class="media-card-thumb"
+                    style="background: var(--ctint-violet)"
+                  >
+                    <div class="card-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="media-card-info">
+                    <h3>Quantum State</h3>
+                    <div class="meta-line">
+                      <span>2025</span><span class="dot"></span
+                      ><span>Sci-Fi</span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="media-card">
+                <a href="#">
+                  <div
+                    class="media-card-thumb"
+                    style="background: var(--ctint-ocean)"
+                  >
+                    <div class="card-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="media-card-info">
+                    <h3>Deep Blue</h3>
+                    <div class="meta-line">
+                      <span>2023</span><span class="dot"></span><span>Doc</span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <div class="media-card">
+                <a href="#">
+                  <div
+                    class="media-card-thumb"
+                    style="background: var(--ctint-violet2)"
+                  >
+                    <div class="card-icon">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="media-card-info">
+                    <h3>Neon Saints</h3>
+                    <div class="meta-line">
+                      <span>2025</span><span class="dot"></span
+                      ><span>Crime</span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="detail-sidebar">
+          <div class="sidebar-block">
+            <h3>Genres</h3>
+            <div class="tag-list">
+              <span>Sci-Fi</span>
+              <span>Adventure</span>
+              <span>Drama</span>
+            </div>
+          </div>
+          <div class="sidebar-block">
+            <h3>Director</h3>
+            <p>Ava Chen</p>
+          </div>
+          <div class="sidebar-block">
+            <h3>Writers</h3>
+            <p>Tomás Rivera<br />Naomi Sterling</p>
+          </div>
+          <div class="sidebar-block">
+            <h3>Language</h3>
+            <p>English · Spanish · French</p>
+          </div>
+          <div class="sidebar-block">
+            <h3>Subtitles</h3>
+            <p>
+              English, Spanish, French, German, Japanese, Korean, Portuguese
+            </p>
+          </div>
+          <div class="sidebar-block">
+            <h3>Production</h3>
+            <p>Aurora Studios · Meridian Pictures</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
