@@ -179,11 +179,52 @@ def movie_api_json(request: HttpRequest, imdb_id: str) -> JsonResponse:
     return JsonResponse(movie)
 
 
-def _search_rapidapi(q: str) -> list[dict]:
-    cache_key = f"search_cache:{q.lower()}"
-    cached = cache.get(cache_key)
+SEARCH_CATALOG_CACHE_KEY = "search_catalog"
+
+
+def _get_search_catalog() -> list[dict]:
+    cached = cache.get(SEARCH_CATALOG_CACHE_KEY)
     if cached is not None:
         return cached
+
+    catalog: list[dict] = []
+    urls = [
+        f"{IMDB_API_BASE}/most-popular-movies",
+        f"{IMDB_API_BASE}/most-popular-tv",
+    ]
+    for url in urls:
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=10)
+            _raise_for_auth(r)
+            if r.ok:
+                raw = r.json()
+                items = raw if isinstance(raw, list) else raw.get("results", raw.get("rows", []))
+                catalog.extend(items)
+        except requests.RequestException:
+            pass
+
+    seen: set[str] = set()
+    unique: list[dict] = []
+    for item in catalog:
+        item_id = item.get("id", "")
+        if item_id and item_id not in seen:
+            seen.add(item_id)
+            item["title"] = item.get("primaryTitle", item.get("title", ""))
+            unique.append(item)
+
+    cache.set(SEARCH_CATALOG_CACHE_KEY, unique, CACHE_TIMEOUT)
+    return unique
+
+
+def _search_rapidapi(q: str) -> list[dict]:
+    ql = q.lower()
+    catalog = _get_search_catalog()
+
+    results = [
+        item
+        for item in catalog
+        if ql in (item.get("title") or "").lower()
+    ]
 
     try:
         r = requests.get(
@@ -194,24 +235,32 @@ def _search_rapidapi(q: str) -> list[dict]:
         _raise_for_auth(r)
         if r.ok:
             raw = r.json()
-            results = [
-                {
-                    "id": item.get("id", ""),
-                    "title": item.get("primaryTitle", item.get("title", "")),
-                    "primaryImage": item.get("primaryImage", ""),
-                    "averageRating": item.get("averageRating"),
-                    "genres": item.get("genres", []),
-                    "startYear": item.get("startYear"),
-                    "description": item.get("description", ""),
-                }
-                for item in (raw if isinstance(raw, list) else raw.get("results", []))
-            ]
-            cache.set(cache_key, results, 300)
-            return results
+            extras = raw if isinstance(raw, list) else raw.get("results", [])
+            seen_ids = {item.get("id", "") for item in results}
+            for item in extras:
+                item["title"] = item.get("primaryTitle", item.get("title", ""))
+                if (
+                    item.get("id", "") not in seen_ids
+                    and ql in (item["title"] or "").lower()
+                ):
+                    results.append(item)
     except requests.RequestException:
         pass
 
-    return []
+    results.sort(key=lambda x: x.get("averageRating") or 0, reverse=True)
+
+    return [
+        {
+            "id": item.get("id", ""),
+            "title": item.get("title", ""),
+            "primaryImage": item.get("primaryImage", ""),
+            "averageRating": item.get("averageRating"),
+            "genres": item.get("genres", []),
+            "startYear": item.get("startYear"),
+            "description": item.get("description", ""),
+        }
+        for item in results
+    ][:50]
 
 
 @require_GET
