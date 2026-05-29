@@ -1,0 +1,523 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "fbbe508f4fa110f71a24dbc47c326b697a3e3f73",
+  "generatedAt": "2026-05-29T18:00:00.689Z",
+  "files": {
+    ".understand-anything/.understandignore": {
+      "filePath": ".understand-anything/.understandignore",
+      "contentHash": "ed124b5e509f6e6a8bd07c88eed0edfa698fff9b217678bed7c3f9cb084ae349",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": false
+    },
+    "config/__init__.py": {
+      "filePath": "config/__init__.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "config/asgi.py": {
+      "filePath": "config/asgi.py",
+      "contentHash": "f23d09f7cded8ce1239e5fbb32961ea409103501b9958934dbd77e92d4a8db21",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "django.core.asgi",
+          "specifiers": [
+            "get_asgi_application"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "config/settings.py": {
+      "filePath": "config/settings.py",
+      "contentHash": "0ea0f73740d0b774cd8ad4839716cf654f933fa0be68bbfb3cf107cca49e48d4",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "dotenv",
+          "specifiers": [
+            "load_dotenv"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 123,
+      "hasStructuralAnalysis": true
+    },
+    "config/urls.py": {
+      "filePath": "config/urls.py",
+      "contentHash": "ef1747a1c02858f640661c2c40055d87d8207c13b4253135318738bba413c999",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "django.contrib",
+          "specifiers": [
+            "admin"
+          ]
+        },
+        {
+          "source": "django.urls",
+          "specifiers": [
+            "path",
+            "include"
+          ]
+        },
+        {
+          "source": "django.views.generic",
+          "specifiers": [
+            "RedirectView"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 10,
+      "hasStructuralAnalysis": true
+    },
+    "config/wsgi.py": {
+      "filePath": "config/wsgi.py",
+      "contentHash": "a7b47958708160e7ebcb377d677f5f2081640fb5dc4478bb486743055a85e192",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "django.core.wsgi",
+          "specifiers": [
+            "get_wsgi_application"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "core/__init__.py": {
+      "filePath": "core/__init__.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "core/admin.py": {
+      "filePath": "core/admin.py",
+      "contentHash": "8e044cd1ba237c77157ddb4b99ef3031a75bfa922fb7ebda623c5377640514ae",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "django.contrib",
+          "specifiers": [
+            "admin"
+          ]
+        },
+        {
+          "source": ".models",
+          "specifiers": [
+            "Item"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 5,
+      "hasStructuralAnalysis": true
+    },
+    "core/apps.py": {
+      "filePath": "core/apps.py",
+      "contentHash": "87859221a40be4fd2c6789921d5a13e7d06f96311617a6fe492076d33ccbebd1",
+      "functions": [],
+      "classes": [
+        {
+          "name": "CoreConfig",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 3
+        }
+      ],
+      "imports": [
+        {
+          "source": "django.apps",
+          "specifiers": [
+            "AppConfig"
+          ]
+        }
+      ],
+      "exports": [
+        "CoreConfig"
+      ],
+      "totalLines": 6,
+      "hasStructuralAnalysis": true
+    },
+    "core/migrations/__init__.py": {
+      "filePath": "core/migrations/__init__.py",
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "core/migrations/0001_initial.py": {
+      "filePath": "core/migrations/0001_initial.py",
+      "contentHash": "d26ab8c452fab781207428d1fb98d6dd64aa58712166f9acb9c79c044beb22da",
+      "functions": [],
+      "classes": [
+        {
+          "name": "Migration",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 18
+        }
+      ],
+      "imports": [
+        {
+          "source": "django.db",
+          "specifiers": [
+            "migrations",
+            "models"
+          ]
+        }
+      ],
+      "exports": [
+        "Migration"
+      ],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "core/models.py": {
+      "filePath": "core/models.py",
+      "contentHash": "3051b2e02433e6e671c460809562aac11b1dd53c2d3364d07f3d6dbe62f832c4",
+      "functions": [],
+      "classes": [
+        {
+          "name": "Item",
+          "methods": [
+            "__str__",
+            "__repr__"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "imports": [
+        {
+          "source": "django.db",
+          "specifiers": [
+            "models"
+          ]
+        }
+      ],
+      "exports": [
+        "Item"
+      ],
+      "totalLines": 21,
+      "hasStructuralAnalysis": true
+    },
+    "core/static/core/css/detail.css": {
+      "filePath": "core/static/core/css/detail.css",
+      "contentHash": "6cb983fcf663c1b1f53157a8420dfde00ce2c2ea2947aaf24a2e66f08fa52641",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 216,
+      "hasStructuralAnalysis": false
+    },
+    "core/static/core/js/detail.js": {
+      "filePath": "core/static/core/js/detail.js",
+      "contentHash": "624ef2690d3aa282135db9035cb953a81044799a6ad8bb35c7be36f83911633b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 220,
+      "hasStructuralAnalysis": true
+    },
+    "core/static/core/style.css": {
+      "filePath": "core/static/core/style.css",
+      "contentHash": "786491a2e136c70e2f767455f65c2e5eda276a622704311dae04762568869371",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 181,
+      "hasStructuralAnalysis": false
+    },
+    "core/templates/core/detail.html": {
+      "filePath": "core/templates/core/detail.html",
+      "contentHash": "8edb6e72adf3b4c6aeeb599691b2928d680739ad77cabfae2f14e82c4a98d94d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 220,
+      "hasStructuralAnalysis": false
+    },
+    "core/templates/core/home.html": {
+      "filePath": "core/templates/core/home.html",
+      "contentHash": "6d3802dfd04387004b85eafb3c1da5e5e2b217a0f16a61ae48aa6afcecbd2583",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 651,
+      "hasStructuralAnalysis": false
+    },
+    "core/templates/core/template.html": {
+      "filePath": "core/templates/core/template.html",
+      "contentHash": "f23803dc865b684e04e7837b706f41da1981d92fd22768c277add2309b9d4d48",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 864,
+      "hasStructuralAnalysis": false
+    },
+    "core/urls.py": {
+      "filePath": "core/urls.py",
+      "contentHash": "8e705a3b8962afe58e4d4c65eff8f4aff11d68a3b74562b9ee78b90ca7df0dcd",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "django.urls",
+          "specifiers": [
+            "path"
+          ]
+        },
+        {
+          "source": ".",
+          "specifiers": [
+            "views"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 13,
+      "hasStructuralAnalysis": true
+    },
+    "core/views.py": {
+      "filePath": "core/views.py",
+      "contentHash": "72fe2be9c0bb8c16b023a64fc203c32fb1fde8e89d392ca4ed3d19bf8bc631ff",
+      "functions": [
+        {
+          "name": "_raise_for_auth",
+          "params": [
+            "response"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "_fetch_movies",
+          "params": [],
+          "returnType": "list[dict]",
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "_fetch_movie_by_id",
+          "params": [
+            "imdb_id"
+          ],
+          "returnType": "dict | None",
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "_get_cached_movies",
+          "params": [],
+          "returnType": "list[dict]",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "movie_detail",
+          "params": [
+            "request",
+            "pk"
+          ],
+          "returnType": "HttpResponse",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "movie_detail_imdb",
+          "params": [
+            "request",
+            "imdb_id"
+          ],
+          "returnType": "HttpResponse",
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "movie_api_json",
+          "params": [
+            "request",
+            "imdb_id"
+          ],
+          "returnType": "JsonResponse",
+          "exported": true,
+          "lineCount": 28
+        }
+      ],
+      "classes": [
+        {
+          "name": "HomeView",
+          "methods": [
+            "get_context_data"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "requests",
+          "specifiers": [
+            "requests"
+          ]
+        },
+        {
+          "source": "django.core.cache",
+          "specifiers": [
+            "cache"
+          ]
+        },
+        {
+          "source": "django.http",
+          "specifiers": [
+            "Http404",
+            "HttpRequest",
+            "HttpResponse",
+            "JsonResponse"
+          ]
+        },
+        {
+          "source": "django.shortcuts",
+          "specifiers": [
+            "render"
+          ]
+        },
+        {
+          "source": "django.views.decorators.http",
+          "specifiers": [
+            "require_GET"
+          ]
+        },
+        {
+          "source": "django.views.generic",
+          "specifiers": [
+            "ListView"
+          ]
+        },
+        {
+          "source": ".models",
+          "specifiers": [
+            "Item"
+          ]
+        }
+      ],
+      "exports": [
+        "_raise_for_auth",
+        "_fetch_movies",
+        "_fetch_movie_by_id",
+        "_get_cached_movies",
+        "HomeView",
+        "movie_detail",
+        "movie_detail_imdb",
+        "movie_api_json"
+      ],
+      "totalLines": 178,
+      "hasStructuralAnalysis": true
+    },
+    "manage.py": {
+      "filePath": "manage.py",
+      "contentHash": "b30eeb4890cb6f315cc238313808f636db29e9906b61cc6f6051567156a0097b",
+      "functions": [
+        {
+          "name": "main",
+          "params": [],
+          "exported": true,
+          "lineCount": 12
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        }
+      ],
+      "exports": [
+        "main"
+      ],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "a9c067679c496b17e5591533aad0f65f71319dc1ca8f9c2925ebf7162de4aeb4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 4,
+      "hasStructuralAnalysis": true
+    }
+  }
+}

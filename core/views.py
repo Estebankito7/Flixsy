@@ -107,6 +107,8 @@ class HomeView(ListView):
     def get_context_data(self, **kwargs) -> dict:
         ctx = super().get_context_data(**kwargs)
         ctx["peliculas"] = _get_cached_movies()
+        ctx["rapidapi_host"] = RAPIDAPI_HOST
+        ctx["rapidapi_key"] = RAPIDAPI_KEY
         return ctx
 
 
