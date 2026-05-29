@@ -1,5 +1,7 @@
 # Environment variables
 .env
+.env.local
+.env.production
 
 # Python
 __pycache__/
@@ -7,15 +9,30 @@ __pycache__/
 *.egg-info/
 dist/
 build/
+*.pyc
 
 # Virtual environment
 venv/
+.venv/
 
 # Database
 *.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Django
+media/
+staticfiles/
+
+# Node
+node_modules/

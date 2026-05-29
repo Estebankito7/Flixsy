@@ -1,0 +1,270 @@
+(function () {
+  "use strict";
+
+  /* ========================================================================
+   * CONFIGURATION
+   * ======================================================================== */
+  const config = window.API_CONFIG || {};
+  const API = {
+    BASE: "https://imdb236.p.rapidapi.com",
+    MOVIES: "/api/imdb/most-popular-movies",
+    SERIES: "/api/imdb/most-popular-tv",
+    HEADERS: {
+      "Content-Type": "application/json",
+      "x-rapidapi-host": config.host || "",
+      "x-rapidapi-key": config.key || "",
+    },
+    HERO_COUNT: 5,
+    SLIDE_MS: 5500,
+  };
+
+  /* ========================================================================
+   * SVG ICONS
+   * ======================================================================== */
+  const ICONS = {
+    play: '<polygon points="5 3 19 12 5 21 5 3" />',
+    info: '<circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />',
+    star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />',
+  };
+
+  function svg(viewBox, inner, fill) {
+    const fillAttr = fill === "currentColor" ? 'fill="currentColor"' : `fill="${fill || "none"}"`;
+    return `<svg viewBox="${viewBox}" ${fillAttr} stroke="currentColor" stroke-width="1.8">${inner}</svg>`;
+  }
+
+  /* ========================================================================
+   * DOM REFERENCES
+   * ======================================================================== */
+  const DOM = {
+    heroSlides: document.getElementById("heroSlides"),
+    heroDots: document.getElementById("heroDots"),
+    moviesRow: document.getElementById("moviesRow"),
+    moviesSection: document.querySelector('[data-od-id="movies"]'),
+    seriesRow: document.getElementById("seriesRow"),
+    seriesSection: document.querySelector('[data-od-id="series"]'),
+    genreChips: document.querySelectorAll(".chip"),
+    navItems: document.querySelectorAll(".nav-rail-item, .bottom-nav-item"),
+  };
+
+  /* ========================================================================
+   * STATE
+   * ======================================================================== */
+  const state = {
+    slideIdx: 0,
+    slideTimer: null,
+    moviesCache: [],
+    seriesCache: [],
+  };
+
+  /* ========================================================================
+   * API SERVICE
+   * ======================================================================== */
+  async function fetchFromIMDb(endpoint, params) {
+    let url = API.BASE + endpoint;
+    if (params) {
+      const qs = Object.keys(params)
+        .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
+        .join("&");
+      url += "?" + qs;
+    }
+    const r = await fetch(url, { headers: API.HEADERS });
+    if (!r.ok) throw new Error("IMDb API error: " + r.status);
+    return r.json();
+  }
+
+  /* ========================================================================
+   * FORMATTING HELPERS
+   * ======================================================================== */
+  function escapeHtml(text) {
+    const d = document.createElement("div");
+    d.textContent = String(text);
+    return d.innerHTML;
+  }
+
+  function normalizeImdbId(id) {
+    return "tt" + (id || "").replace(/^tt/, "");
+  }
+
+  function normalizeItems(items) {
+    return (items || []).map(m => Object.assign({}, m, { title: m.primaryTitle }));
+  }
+
+  /* ========================================================================
+   * RENDERERS — Media Card
+   * ======================================================================== */
+  function createMediaCard(item) {
+    const imdbId = normalizeImdbId(item.id);
+    const thumbnail = item.primaryImage
+      ? `<img src="${escapeHtml(item.primaryImage)}" alt="${escapeHtml(item.title)}" style="object-fit:cover;position:absolute;inset:0;width:100%;height:100%;" loading="lazy">`
+      : `<div class="card-icon">${svg("0 0 24 24", ICONS.play, "currentColor")}</div>`;
+
+    return (
+      `<div class="media-card">` +
+      `<a href="/detail/${imdbId}/">` +
+      `<div class="media-card-thumb" style="position:relative;overflow:hidden;">${thumbnail}</div>` +
+      `<div class="media-card-info"><h3>${escapeHtml(item.title)}</h3></div>` +
+      `</a></div>`
+    );
+  }
+
+  /* ========================================================================
+   * RENDERERS — Hero Carousel
+   * ======================================================================== */
+  function createHeroSlide(item) {
+    const genres = (item.genres || []).slice(0, 2);
+    const imdbId = normalizeImdbId(item.id);
+    const yearBadge = item.startYear
+      ? `<span class="badge">${escapeHtml(item.startYear)}</span>`
+      : "";
+    const background = item.primaryImage
+      ? `<img src="${escapeHtml(item.primaryImage)}" alt="" loading="lazy">`
+      : "";
+
+    return (
+      `<div class="hero-slide">` +
+      `<div class="hero-slide-bg" style="background:linear-gradient(135deg,#111827,#1e293b);">${background}</div>` +
+      `<div class="hero-slide-content">` +
+      `<span class="eyebrow">&#9679; Now Streaming</span>` +
+      `<h1>${escapeHtml(item.title)}</h1>` +
+      `<div class="meta-row">${yearBadge}` +
+      `<span class="rating">${svg("0 0 24 24", ICONS.star, "currentColor")}${item.averageRating || "N/A"}</span>` +
+      genres.map(g => `<span class="badge">${escapeHtml(g)}</span>`).join("") +
+      `</div>` +
+      `<p class="desc">${escapeHtml(item.description || "")}</p>` +
+      `<div class="hero-actions">` +
+      `<a href="/detail/${imdbId}/" class="btn-primary">${svg("0 0 24 24", ICONS.play, "currentColor")}Play</a>` +
+      `<a href="/detail/${imdbId}/" class="btn-secondary">${svg("0 0 24 24", ICONS.info, "none")}More Info</a>` +
+      `</div></div></div>`
+    );
+  }
+
+  /* ========================================================================
+   * HERO CAROUSEL CONTROLS
+   * ======================================================================== */
+  function buildHero(movies) {
+    DOM.heroSlides.innerHTML = movies.map(createHeroSlide).join("");
+    DOM.heroDots.innerHTML = movies
+      .map((_, i) => `<span class="hero-dot${i === 0 ? " active" : ""}" data-index="${i}"></span>`)
+      .join("");
+    state.slideIdx = 0;
+    DOM.heroSlides.style.transform = "translateX(0)";
+    bindHeroDots();
+    resetSlideTimer();
+  }
+
+  function goToSlide(index) {
+    const slides = DOM.heroSlides.children;
+    if (index === state.slideIdx || !slides.length) return;
+    state.slideIdx = index;
+    DOM.heroSlides.style.transform = `translateX(-${index * 100}%)`;
+    Array.from(document.querySelectorAll(".hero-dot")).forEach(
+      (dot, i) => dot.classList.toggle("active", i === index)
+    );
+    resetSlideTimer();
+  }
+
+  function advanceSlide() {
+    const count = DOM.heroSlides.children.length;
+    if (count) goToSlide((state.slideIdx + 1) % count);
+  }
+
+  function resetSlideTimer() {
+    clearInterval(state.slideTimer);
+    state.slideTimer = setInterval(advanceSlide, API.SLIDE_MS);
+  }
+
+  function bindHeroDots() {
+    document.querySelectorAll(".hero-dot").forEach(dot => {
+      dot.addEventListener("click", () => goToSlide(parseInt(dot.dataset.index)));
+    });
+  }
+
+  /* ========================================================================
+   * SECTION ROW MANAGEMENT
+   * ======================================================================== */
+  function populateRow(container, items) {
+    if (!container) return;
+    const section = container.closest("[data-od-id]");
+    if (!items || !items.length) {
+      if (section?.isConnected) section.remove();
+      return;
+    }
+    if (section && !section.isConnected) {
+      const ref = document.querySelector(".genre-strip");
+      if (ref) ref.after(section);
+    }
+    container.innerHTML = items.map(createMediaCard).join("");
+  }
+
+  /* ========================================================================
+   * DATA LOADING
+   * ======================================================================== */
+  async function loadMovies() {
+    const raw = await fetchFromIMDb(API.MOVIES);
+    if (!Array.isArray(raw)) throw new Error("Invalid movies response");
+    state.moviesCache = normalizeItems(raw);
+    const heroCandidates = state.moviesCache.filter(m => m.primaryImage);
+    if (heroCandidates.length) {
+      buildHero(heroCandidates.slice(0, API.HERO_COUNT));
+    }
+    populateRow(DOM.moviesRow, state.moviesCache);
+  }
+
+  async function loadSeries() {
+    const raw = await fetchFromIMDb(API.SERIES);
+    if (!Array.isArray(raw)) throw new Error("Invalid series response");
+    state.seriesCache = normalizeItems(raw);
+    populateRow(DOM.seriesRow, state.seriesCache);
+  }
+
+  /* ========================================================================
+   * GENRE FILTERING
+   * ======================================================================== */
+  function setupGenreFiltering() {
+    DOM.genreChips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        DOM.genreChips.forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        const genre = chip.textContent.trim();
+        if (genre === "All") {
+          populateRow(DOM.moviesRow, state.moviesCache);
+          return;
+        }
+        const filtered = state.moviesCache.filter(
+          item => item.genres && item.genres.some(g => g.toLowerCase() === genre.toLowerCase())
+        );
+        populateRow(DOM.moviesRow, filtered);
+      });
+    });
+  }
+
+  /* ========================================================================
+   * NAVIGATION
+   * ======================================================================== */
+  function setupNavigation() {
+    DOM.navItems.forEach(item => {
+      item.addEventListener("click", () => {
+        const parent = item.closest(".nav-rail-items, .bottom-nav-inner") || item.parentNode;
+        parent.querySelectorAll(".nav-rail-item, .bottom-nav-item").forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
+      });
+    });
+  }
+
+  /* ========================================================================
+   * INIT
+   * ======================================================================== */
+  async function init() {
+    setupNavigation();
+    setupGenreFiltering();
+    bindHeroDots();
+    resetSlideTimer();
+    try {
+      await Promise.all([loadMovies(), loadSeries()]);
+    } catch (e) {
+      console.warn("Flixsy: IMDb API unavailable", e);
+    }
+  }
+
+  init();
+})();
