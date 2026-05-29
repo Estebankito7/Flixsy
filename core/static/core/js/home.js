@@ -4,16 +4,8 @@
   /* ========================================================================
    * CONFIGURATION
    * ======================================================================== */
-  const config = window.API_CONFIG || {};
   const API = {
-    BASE: "https://imdb236.p.rapidapi.com",
-    MOVIES: "/api/imdb/most-popular-movies",
-    SERIES: "/api/imdb/most-popular-tv",
-    HEADERS: {
-      "Content-Type": "application/json",
-      "x-rapidapi-host": config.host || "",
-      "x-rapidapi-key": config.key || "",
-    },
+    TRENDING: "/api/trending/",
     HERO_COUNT: 5,
     SLIDE_MS: 5500,
   };
@@ -59,16 +51,9 @@
   /* ========================================================================
    * API SERVICE
    * ======================================================================== */
-  async function fetchFromIMDb(endpoint, params) {
-    let url = API.BASE + endpoint;
-    if (params) {
-      const qs = Object.keys(params)
-        .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
-        .join("&");
-      url += "?" + qs;
-    }
-    const r = await fetch(url, { headers: API.HEADERS });
-    if (!r.ok) throw new Error("IMDb API error: " + r.status);
+  async function fetchFromDjango(url) {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error("Django API error: " + r.status);
     return r.json();
   }
 
@@ -81,26 +66,18 @@
     return d.innerHTML;
   }
 
-  function normalizeImdbId(id) {
-    return "tt" + (id || "").replace(/^tt/, "");
-  }
-
-  function normalizeItems(items) {
-    return (items || []).map(m => Object.assign({}, m, { title: m.primaryTitle }));
-  }
-
   /* ========================================================================
    * RENDERERS — Media Card
    * ======================================================================== */
   function createMediaCard(item) {
-    const imdbId = normalizeImdbId(item.id);
+    const id = item.id;
     const thumbnail = item.primaryImage
       ? `<img src="${escapeHtml(item.primaryImage)}" alt="${escapeHtml(item.title)}" style="object-fit:cover;position:absolute;inset:0;width:100%;height:100%;" loading="lazy">`
       : `<div class="card-icon">${svg("0 0 24 24", ICONS.play, "currentColor")}</div>`;
 
     return (
       `<div class="media-card">` +
-      `<a href="/detail/${imdbId}/">` +
+      `<a href="/detail/${id}/">` +
       `<div class="media-card-thumb" style="position:relative;overflow:hidden;">${thumbnail}</div>` +
       `<div class="media-card-info"><h3>${escapeHtml(item.title)}</h3></div>` +
       `</a></div>`
@@ -112,7 +89,7 @@
    * ======================================================================== */
   function createHeroSlide(item) {
     const genres = (item.genres || []).slice(0, 2);
-    const imdbId = normalizeImdbId(item.id);
+    const id = item.id;
     const yearBadge = item.startYear
       ? `<span class="badge">${escapeHtml(item.startYear)}</span>`
       : "";
@@ -132,8 +109,8 @@
       `</div>` +
       `<p class="desc">${escapeHtml(item.description || "")}</p>` +
       `<div class="hero-actions">` +
-      `<a href="/detail/${imdbId}/" class="btn-primary">${svg("0 0 24 24", ICONS.play, "currentColor")}Play</a>` +
-      `<a href="/detail/${imdbId}/" class="btn-secondary">${svg("0 0 24 24", ICONS.info, "none")}More Info</a>` +
+      `<a href="/detail/${id}/" class="btn-primary">${svg("0 0 24 24", ICONS.play, "currentColor")}Play</a>` +
+      `<a href="/detail/${id}/" class="btn-secondary">${svg("0 0 24 24", ICONS.info, "none")}More Info</a>` +
       `</div></div></div>`
     );
   }
@@ -200,9 +177,10 @@
    * DATA LOADING
    * ======================================================================== */
   async function loadMovies() {
-    const raw = await fetchFromIMDb(API.MOVIES);
-    if (!Array.isArray(raw)) throw new Error("Invalid movies response");
-    state.moviesCache = normalizeItems(raw);
+    const data = await fetchFromDjango(API.TRENDING + "?media_type=movie&time_window=day");
+    const raw = data.results || [];
+    if (!Array.isArray(raw)) throw new Error("Invalid trending response");
+    state.moviesCache = raw;
     const heroCandidates = state.moviesCache.filter(m => m.primaryImage);
     if (heroCandidates.length) {
       buildHero(heroCandidates.slice(0, API.HERO_COUNT));
@@ -211,9 +189,10 @@
   }
 
   async function loadSeries() {
-    const raw = await fetchFromIMDb(API.SERIES);
-    if (!Array.isArray(raw)) throw new Error("Invalid series response");
-    state.seriesCache = normalizeItems(raw);
+    const data = await fetchFromDjango(API.TRENDING + "?media_type=tv&time_window=day");
+    const raw = data.results || [];
+    if (!Array.isArray(raw)) throw new Error("Invalid trending series response");
+    state.seriesCache = raw;
     populateRow(DOM.seriesRow, state.seriesCache);
   }
 
@@ -262,7 +241,7 @@
     try {
       await Promise.all([loadMovies(), loadSeries()]);
     } catch (e) {
-      console.warn("Flixsy: IMDb API unavailable", e);
+      console.warn("Flixsy: Trending API unavailable", e);
     }
   }
 

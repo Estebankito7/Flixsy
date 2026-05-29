@@ -84,7 +84,7 @@
       </header>
 
       <main class="main"
-            data-imdb-id="{{ movie.id }}"
+            data-imdb-id="{{ movie.imdb_id|default:movie.id }}"
             data-season="{{ season|default:'1' }}"
             data-episode="{{ episode|default:'1' }}">
       {% if movie.primaryImage %}
@@ -129,7 +129,7 @@
 
                 <div class="detail-actions">
                   <button class="btn-stadium primary"
-                          data-imdb-id="{{ movie.id }}"
+                          data-imdb-id="{{ movie.imdb_id|default:movie.id }}"
                           data-type="{{ movie.type }}"
                           data-season="{{ season|default:1 }}"
                           data-episode="{{ episode|default:1 }}">

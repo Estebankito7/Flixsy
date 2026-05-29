@@ -47,6 +47,8 @@
 /* ─── Media Cards ─── */
 .card-row { display: flex; gap: var(--gap-md); padding: 0 var(--gap-xl); overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; }
 .card-row::-webkit-scrollbar { display: none; }
+.card-results { display: flex; flex-wrap: wrap; gap: var(--gap-md); padding: 0 var(--gap-xl); width: 100%; }
+
 .media-card { flex-shrink: 0; width: 180px; border-radius: var(--radius-md); overflow: hidden; background: var(--surface); transition: transform var(--motion-base) var(--ease-out); cursor: pointer; }
 .media-card:hover { transform: translateY(-4px); }
 .media-card a { display: block; }

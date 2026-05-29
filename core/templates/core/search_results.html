@@ -103,104 +103,103 @@
         </div>
       </div>
 
-      <div class="section-head" style="padding-top: var(--gap-lg)">
-        <h2>Search Results</h2>
-        {% if query %}
-        <span
-          class="see-all"
-          style="font-size: 14px; color: var(--fg-secondary); font-weight: 400"
-          >{{ results|length }} result{{ results|length|pluralize }} for "{{
-          query }}"</span
+      <div class="section-wrap">
+        <div class="section-head">
+          <h2>Search Results</h2>
+          {% if query %}
+          <span class="see-all">{{ results|length }} result{{ results|length|pluralize }} for "{{ query }}"</span>
+          {% endif %}
+        </div>
+
+        {% if results %}
+        <div class="card-results">
+          {% for item in results %}
+          <div class="media-card">
+            <a href="/detail/{{ item.id }}/">
+              <div
+                class="media-card-thumb"
+                style="position: relative; overflow: hidden"
+              >
+                {% if item.imagen %}
+                <img
+                  src="{{ item.imagen }}"
+                  alt="{{ item.titulo }}"
+                  style="
+                    object-fit: cover;
+                    position: absolute;
+                    inset: 0;
+                    width: 100%;
+                    height: 100%;
+                  "
+                  loading="lazy"
+                />
+                {% else %}
+                <div class="card-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                </div>
+                {% endif %}
+              </div>
+              <div class="media-card-info">
+                <h3>{{ item.titulo }}</h3>
+              </div>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+        {% elif query %}
+        <div
+          style="
+            text-align: center;
+            padding: 80px 0;
+            color: var(--fg-secondary);
+          "
         >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            style="
+              width: 48px;
+              height: 48px;
+              margin: 0 auto 16px;
+              opacity: 0.3;
+            "
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <p style="font-size: 16px">No results found for "{{ query }}"</p>
+        </div>
+        {% else %}
+        <div
+          style="
+            text-align: center;
+            padding: 80px 0;
+            color: var(--fg-secondary);
+          "
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            style="
+              width: 48px;
+              height: 48px;
+              margin: 0 auto 16px;
+              opacity: 0.3;
+            "
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <p style="font-size: 16px">Enter a search term above</p>
+        </div>
         {% endif %}
       </div>
-
-      {% if results %}
-      <div
-        class="card-row"
-        style="
-          flex-wrap: wrap;
-          overflow-x: visible;
-          padding-bottom: var(--gap-xl);
-        "
-      >
-        {% for item in results %}
-        <div class="media-card" style="width: 180px">
-          <a href="/detail/{{ item.id }}/">
-            <div
-              class="media-card-thumb"
-              style="position: relative; overflow: hidden"
-            >
-              {% if item.primaryImage %}
-              <img
-                src="{{ item.primaryImage }}"
-                alt="{{ item.title }}"
-                style="
-                  object-fit: cover;
-                  position: absolute;
-                  inset: 0;
-                  width: 100%;
-                  height: 100%;
-                "
-                loading="lazy"
-              />
-              {% else %}
-              <div class="card-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="5 3 19 12 5 21 5 3" />
-                </svg>
-              </div>
-              {% endif %} {% if item.averageRating %}
-              <span class="card-badge">{{ item.averageRating }}</span>
-              {% endif %}
-            </div>
-            <div class="media-card-info">
-              <h3>{{ item.title }}</h3>
-              <div class="meta-line">
-                {% if item.startYear %}<span>{{ item.startYear }}</span>{% endif
-                %} {% if item.genres and item.genres.0 %}<span
-                  class="dot"
-                ></span
-                ><span>{{ item.genres.0 }}</span>{% endif %}
-              </div>
-            </div>
-          </a>
-        </div>
-        {% endfor %}
-      </div>
-      {% elif query %}
-      <div
-        style="text-align: center; padding: 80px 0; color: var(--fg-secondary)"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          style="width: 48px; height: 48px; margin: 0 auto 16px; opacity: 0.3"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="M21 21l-4.35-4.35" />
-        </svg>
-        <p style="font-size: 16px">No results found for "{{ query }}"</p>
-      </div>
-      {% else %}
-      <div
-        style="text-align: center; padding: 80px 0; color: var(--fg-secondary)"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          style="width: 48px; height: 48px; margin: 0 auto 16px; opacity: 0.3"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="M21 21l-4.35-4.35" />
-        </svg>
-        <p style="font-size: 16px">Enter a search term above</p>
-      </div>
-      {% endif %}
     </div>
 
     <nav class="bottom-nav" aria-label="Main">
