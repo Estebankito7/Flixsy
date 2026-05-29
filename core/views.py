@@ -187,7 +187,7 @@ def _search_rapidapi(q: str) -> list[dict]:
 
     try:
         r = requests.get(
-            f"{IMDB_API_BASE}/search/{requests.utils.quote(q)}",
+            f"{IMDB_API_BASE}/search?query={requests.utils.quote(q)}",
             headers=HEADERS,
             timeout=10,
         )
@@ -217,7 +217,7 @@ def _search_rapidapi(q: str) -> list[dict]:
 @require_GET
 def search_results(request: HttpRequest) -> HttpResponse:
     q = request.GET.get("q", "").strip()
-    results = _search_rapidapi(q) if len(q) >= 2 else []
+    results = _search_rapidapi(q) if q else []
     return render(request, "core/search_results.html", {
         "query": q,
         "results": results,
@@ -227,5 +227,5 @@ def search_results(request: HttpRequest) -> HttpResponse:
 @require_GET
 def search_api(request: HttpRequest) -> JsonResponse:
     q = request.GET.get("q", "").strip()
-    results = _search_rapidapi(q) if len(q) >= 2 else []
+    results = _search_rapidapi(q) if q else []
     return JsonResponse({"results": results, "query": q})
