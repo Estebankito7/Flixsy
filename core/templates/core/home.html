@@ -599,13 +599,123 @@
           }
         }
 
-        /* ─── SEARCH MODULE (PLACEHOLDER) ─── */
-        /*
-          To add independent search for movies or series:
-          1. Create a function here that reads from state.moviesCache / state.seriesCache
-          2. Filter by user query and call fillRow(DOM.moviesRow, filtered) or fillRow(DOM.seriesRow, filtered)
-          3. Wire it to an input event or a dedicated search endpoint via fetchFromIMDb()
-        */
+        /* ─── SEARCH MODULE ─── */
+        var searchDebounce = null;
+        var searchActive = false;
+        var searchResultsHeader = null;
+
+        function buildFuse(data) {
+          return new Fuse(data || [], {
+            keys: ["title", "primaryTitle"],
+            threshold: 0.4,
+            ignoreLocation: true,
+            minMatchCharLength: 2,
+          });
+        }
+
+        function renderSearchResults(query, localMovies, localSeries) {
+          var total = (localMovies ? localMovies.length : 0) + (localSeries ? localSeries.length : 0);
+
+          var hero = document.querySelector(".hero-section");
+          var genres = document.querySelector(".genre-strip");
+          if (hero) hero.style.display = total > 0 ? "none" : "";
+          if (genres) genres.style.display = total > 0 ? "none" : "";
+
+          if (!searchResultsHeader) {
+            searchResultsHeader = document.createElement("div");
+            searchResultsHeader.className = "search-results-header";
+            var moviesSection = document.querySelector('[data-od-id="movies"]');
+            if (moviesSection && moviesSection.parentNode) {
+              moviesSection.parentNode.insertBefore(searchResultsHeader, moviesSection);
+            }
+          }
+
+          if (total > 0) {
+            searchResultsHeader.innerHTML = 'Results for "' + esc(query) + '" <span class="search-count">(' + total + ')</span>';
+            searchResultsHeader.style.display = "";
+          } else {
+            searchResultsHeader.innerHTML = 'No results found for "' + esc(query) + '"';
+            searchResultsHeader.style.display = "";
+          }
+
+          fillRow(DOM.moviesRow, localMovies || []);
+          fillRow(DOM.seriesRow, localSeries || []);
+          searchActive = true;
+        }
+
+        function restoreDefaultView() {
+          searchActive = false;
+          var hero = document.querySelector(".hero-section");
+          var genres = document.querySelector(".genre-strip");
+          if (hero) hero.style.display = "";
+          if (genres) genres.style.display = "";
+          if (searchResultsHeader) searchResultsHeader.style.display = "none";
+          fillRow(DOM.moviesRow, state.moviesCache);
+          fillRow(DOM.seriesRow, state.seriesCache);
+          document.getElementById("searchInput").value = "";
+          document.getElementById("searchClear").style.display = "none";
+        }
+
+        function performSearch(query) {
+          query = (query || "").trim();
+          var clearBtn = document.getElementById("searchClear");
+
+          if (query.length < 2) {
+            if (searchActive) restoreDefaultView();
+            if (clearBtn) clearBtn.style.display = "none";
+            return;
+          }
+
+          if (clearBtn) clearBtn.style.display = "block";
+
+          // Client-side: fuzzy match on cached data
+          var movieFuse = buildFuse(state.moviesCache);
+          var seriesFuse = buildFuse(state.seriesCache);
+          var movieResults = movieFuse.search(query).map(function (r) { return r.item; });
+          var seriesResults = seriesFuse.search(query).map(function (r) { return r.item; });
+          renderSearchResults(query, movieResults, seriesResults);
+
+          // Server-side: fetch full catalog from RapidAPI via Django
+          fetch("/search/?q=" + encodeURIComponent(query))
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+              if (!data || !data.results || data.results.length === 0) return;
+              // If server returned more results than local cache, use them
+              if (data.results.length > movieResults.length + seriesResults.length) {
+                renderSearchResults(query, data.results, []);
+              }
+            })
+            .catch(function () {
+              // Graceful degradation: keep client-side results
+            });
+        }
+
+        function initSearch() {
+          var input = document.getElementById("searchInput");
+          var clearBtn = document.getElementById("searchClear");
+          if (!input) return;
+
+          input.addEventListener("input", function () {
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(function () {
+              performSearch(input.value);
+            }, 300);
+          });
+
+          input.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") {
+              restoreDefaultView();
+              input.blur();
+            }
+          });
+
+          if (clearBtn) {
+            clearBtn.addEventListener("click", function () {
+              restoreDefaultView();
+              input.focus();
+            });
+          }
+        }
 
         /* ─── GENRE CHIPS MODULE ─── */
         DOM.genreChips.forEach(function (chip) {
@@ -652,6 +762,7 @@
         bindDots();
         resetTimer();
         init();
+        initSearch();
       })();
     </script>
   </body>
