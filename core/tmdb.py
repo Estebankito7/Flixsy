@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import requests
 
@@ -40,6 +40,33 @@ POSTER_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
 
 class TMDBClient:
+    """Cliente para la API de TMDB v3.
+
+    Reemplaza al antiguo IMDBClient (RapidAPI). Maneja la autenticación
+    mediante la clave TMDB_API_KEY del entorno y normaliza las respuestas
+    de TMDB al formato que esperan las vistas y plantillas de Flixsy.
+
+    Flujo de integración:
+        views.py → instancia global ``tmdb = TMDBClient()`` y la usa en
+        cada vista. Los datos normalizados se pasan al contexto de las
+        plantillas como diccionarios con claves en español (``titulo``,
+        ``imagen``, ``calificacion``) para búsqueda y en inglés
+        (``title``, ``primaryImage``, ``averageRating``) para el home
+        (compatibilidad con home.js).
+
+    Mapeo de datos TMDB → Flixsy:
+        - ``id`` → id numérico de TMDB (se reemplaza por ``imdb_id`` en
+          trending para garantizar unicidad global entre movies y TV).
+        - ``title``/``name`` → ``title`` (y ``titulo`` en búsqueda).
+        - ``poster_path`` → ``primaryImage``/``imagen`` (URL completa).
+        - ``vote_average`` → ``averageRating``/``calificacion``.
+        - ``release_date``/``first_air_date`` → ``startYear`` y ``releaseDate``.
+        - ``overview`` → ``description``/``resumen``.
+        - ``credits.crew[].job`` → ``directors`` y ``writers``.
+        - ``genres[].name`` → ``genres``.
+        - ``imdb_id`` / ``external_ids.imdb_id`` → ``imdb_id``.
+    """
+
     def __init__(self, config: TMDBConfig | None = None) -> None:
         self.config = config or TMDBConfig()
         self._session = requests.Session()
