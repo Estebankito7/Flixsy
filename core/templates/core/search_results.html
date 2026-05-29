@@ -1,0 +1,138 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Search · Flixsy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'core/style.css' %}" />
+    <style>
+      .search-page { padding: var(--gap-lg) var(--gap-xl); max-width: 1240px; margin: 0 auto; }
+      .search-page h1 { font-size: var(--fs-h1); font-weight: 700; margin-bottom: var(--gap-sm); }
+      .search-page .search-meta { color: var(--fg-secondary); margin-bottom: var(--gap-lg); }
+      .search-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--gap-md); }
+      .search-empty { text-align: center; padding: var(--gap-2xl) 0; color: var(--fg-secondary); }
+      .search-empty svg { width: 48px; height: 48px; margin: 0 auto var(--gap-md); opacity: 0.3; }
+      .search-empty p { font-size: 16px; }
+    </style>
+  </head>
+  <body>
+    <nav class="nav-rail" aria-label="Main">
+      <div class="nav-rail-header">
+        <a href="{% url 'core:home' %}" class="nav-rail-logo">F</a>
+        <span class="nav-rail-brand">Flaire</span>
+      </div>
+      <div class="nav-rail-items">
+        <a href="{% url 'core:home' %}" class="nav-rail-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span class="nav-rail-label">Home</span>
+        </a>
+        <button class="nav-rail-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="22 3 22 15 16 11 16 3 22 3"/><rect x="2" y="3" width="14" height="12" rx="2"/></svg>
+          <span class="nav-rail-label">Browse</span>
+        </button>
+        <button class="nav-rail-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          <span class="nav-rail-label">Library</span>
+        </button>
+        <button class="nav-rail-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span class="nav-rail-label">Trending</span>
+        </button>
+        <button class="nav-rail-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span class="nav-rail-label">Favorites</span>
+        </button>
+        <button class="nav-rail-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span class="nav-rail-label">Downloads</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="main">
+      <div class="topbar">
+        <div class="topbar-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <form action="{% url 'core:search' %}" method="GET" autocomplete="off" style="flex:1;">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search movies, shows, genres…" />
+          </form>
+        </div>
+        <div class="topbar-actions">
+          <button aria-label="Notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          </button>
+          <div class="avatar">J</div>
+        </div>
+      </div>
+
+      <div class="search-page">
+        <h1>Search Results</h1>
+        <p class="search-meta">
+          {% if query %}
+            {{ results|length }} result{{ results|length|pluralize }} for "{{ query }}"
+          {% else %}
+            Enter a search term above
+          {% endif %}
+        </p>
+
+        {% if results %}
+        <div class="search-grid">
+          {% for item in results %}
+          <div class="media-card">
+            <a href="/detail/{{ item.id }}/">
+              <div class="media-card-thumb" style="position:relative;overflow:hidden;">
+                {% if item.primaryImage %}
+                <img src="{{ item.primaryImage }}" alt="{{ item.title }}" style="object-fit:cover;position:absolute;inset:0;width:100%;height:100%;" loading="lazy" />
+                {% else %}
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+                {% endif %}
+                {% if item.averageRating %}
+                <span class="card-badge">{{ item.averageRating }}</span>
+                {% endif %}
+              </div>
+              <div class="media-card-info">
+                <h3>{{ item.title }}</h3>
+                <div class="meta-line">
+                  {% if item.startYear %}<span>{{ item.startYear }}</span>{% endif %}
+                  {% if item.genres and item.genres.0 %}<span class="dot"></span><span>{{ item.genres.0 }}</span>{% endif %}
+                </div>
+              </div>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+        {% elif query %}
+        <div class="search-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <p>No results found for "{{ query }}"</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <a href="{% url 'core:home' %}" class="bottom-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>Home</span>
+        </a>
+        <button class="bottom-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="22 3 22 15 16 11 16 3 22 3"/><rect x="2" y="3" width="14" height="12" rx="2"/></svg>
+          <span>Browse</span>
+        </button>
+        <button class="bottom-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          <span>Library</span>
+        </button>
+        <button class="bottom-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Trending</span>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -179,16 +179,11 @@ def movie_api_json(request: HttpRequest, imdb_id: str) -> JsonResponse:
     return JsonResponse(movie)
 
 
-@require_GET
-def search_movies(request: HttpRequest) -> JsonResponse:
-    q = request.GET.get("q", "").strip()
-    if len(q) < 2:
-        return JsonResponse({"results": [], "query": q})
-
+def _search_rapidapi(q: str) -> list[dict]:
     cache_key = f"search_cache:{q.lower()}"
     cached = cache.get(cache_key)
     if cached is not None:
-        return JsonResponse({"results": cached, "query": q})
+        return cached
 
     try:
         r = requests.get(
@@ -212,8 +207,25 @@ def search_movies(request: HttpRequest) -> JsonResponse:
                 for item in (raw if isinstance(raw, list) else raw.get("results", []))
             ]
             cache.set(cache_key, results, 300)
-            return JsonResponse({"results": results, "query": q})
+            return results
     except requests.RequestException:
         pass
 
-    return JsonResponse({"results": [], "query": q})
+    return []
+
+
+@require_GET
+def search_results(request: HttpRequest) -> HttpResponse:
+    q = request.GET.get("q", "").strip()
+    results = _search_rapidapi(q) if len(q) >= 2 else []
+    return render(request, "core/search_results.html", {
+        "query": q,
+        "results": results,
+    })
+
+
+@require_GET
+def search_api(request: HttpRequest) -> JsonResponse:
+    q = request.GET.get("q", "").strip()
+    results = _search_rapidapi(q) if len(q) >= 2 else []
+    return JsonResponse({"results": results, "query": q})

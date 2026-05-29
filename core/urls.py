@@ -9,5 +9,6 @@ urlpatterns = [
     path("item/<int:pk>/", views.movie_detail, name="movie-detail"),
     path("detail/<str:imdb_id>/", views.movie_detail_imdb, name="movie-detail-imdb"),
     path("api/detail/<str:imdb_id>/", views.movie_api_json, name="movie-api-json"),
-    path("search/", views.search_movies, name="search"),
+    path("search/", views.search_results, name="search"),
+    path("search/api/", views.search_api, name="search-api"),
 ]

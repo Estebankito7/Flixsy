@@ -12,7 +12,6 @@
     />
     {% load static %}
     <link rel="stylesheet" href="{% static 'core/style.css' %}" />
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
   </head>
   <body>
     <nav class="nav-rail" role="navigation" aria-label="Main">
@@ -147,7 +146,7 @@
 
     <div class="main">
       <div class="topbar">
-        <div class="topbar-search" id="searchContainer">
+        <div class="topbar-search">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -157,15 +156,13 @@
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
-          <form id="searchForm" autocomplete="off" onsubmit="return false;">
+          <form action="{% url 'core:search' %}" method="GET" autocomplete="off">
             <input
               type="text"
-              id="searchInput"
               name="q"
               placeholder="Search movies, shows, genres…"
             />
           </form>
-          <button id="searchClear" class="search-clear" aria-label="Clear search" style="display:none;">&times;</button>
         </div>
         <div class="topbar-actions">
           <button aria-label="Notifications">
@@ -599,149 +596,6 @@
           }
         }
 
-        /* ─── SEARCH MODULE ─── */
-        var searchDebounce = null;
-        var searchActive = false;
-        var searchResultsHeader = null;
-        var searchRequestId = 0;
-        var searchMovieFuse = null;
-        var searchSeriesFuse = null;
-
-        function initSearchFuses() {
-          searchMovieFuse = new Fuse(state.moviesCache, {
-            keys: ["title", "primaryTitle"],
-            threshold: 0.4,
-            ignoreLocation: true,
-            minMatchCharLength: 2,
-          });
-          searchSeriesFuse = new Fuse(state.seriesCache, {
-            keys: ["title", "primaryTitle"],
-            threshold: 0.4,
-            ignoreLocation: true,
-            minMatchCharLength: 2,
-          });
-        }
-
-        function cancelSearch() {
-          clearTimeout(searchDebounce);
-          searchRequestId++;
-        }
-
-        function renderSearchResults(query, localMovies, localSeries) {
-          var total = (localMovies ? localMovies.length : 0) + (localSeries ? localSeries.length : 0);
-
-          var hero = document.querySelector(".hero-section");
-          var genres = document.querySelector(".genre-strip");
-          if (hero) hero.style.display = total > 0 ? "none" : "";
-          if (genres) genres.style.display = total > 0 ? "none" : "";
-
-          if (!searchResultsHeader) {
-            searchResultsHeader = document.createElement("div");
-            searchResultsHeader.className = "search-results-header";
-            var moviesSection = document.querySelector('[data-od-id="movies"]');
-            if (moviesSection && moviesSection.parentNode) {
-              moviesSection.parentNode.insertBefore(searchResultsHeader, moviesSection);
-            }
-          }
-
-          if (total > 0) {
-            searchResultsHeader.innerHTML = 'Results for "' + esc(query) + '" <span class="search-count">(' + total + ')</span>';
-            searchResultsHeader.style.display = "";
-          } else {
-            searchResultsHeader.innerHTML = 'No results found for "' + esc(query) + '"';
-            searchResultsHeader.style.display = "";
-          }
-
-          fillRow(DOM.moviesRow, localMovies || []);
-          fillRow(DOM.seriesRow, localSeries || []);
-          searchActive = true;
-        }
-
-        function restoreDefaultView() {
-          cancelSearch();
-          searchActive = false;
-          var hero = document.querySelector(".hero-section");
-          var genres = document.querySelector(".genre-strip");
-          if (hero) hero.style.display = "";
-          if (genres) genres.style.display = "";
-          if (searchResultsHeader) searchResultsHeader.style.display = "none";
-          fillRow(DOM.moviesRow, state.moviesCache);
-          fillRow(DOM.seriesRow, state.seriesCache);
-          var inp = document.getElementById("searchInput");
-          if (inp) inp.value = "";
-          var cb = document.getElementById("searchClear");
-          if (cb) cb.style.display = "none";
-        }
-
-        function performSearch(query) {
-          query = query.trim();
-          if (!query) {
-            restoreDefaultView();
-            return;
-          }
-
-          // Client-side: fuzzy match on cached data
-          var movieResults = searchMovieFuse ? searchMovieFuse.search(query).map(function (r) { return r.item; }) : [];
-          var seriesResults = searchSeriesFuse ? searchSeriesFuse.search(query).map(function (r) { return r.item; }) : [];
-          renderSearchResults(query, movieResults, seriesResults);
-
-          // Loading indicator for server-side fetch
-          var searchContainer = document.getElementById("searchContainer");
-          if (searchContainer) searchContainer.classList.add("search-loading");
-
-          // Server-side: fetch full catalog from RapidAPI via Django
-          fetch("/search/?q=" + encodeURIComponent(query))
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (data) {
-              if (rid !== searchRequestId) return; // stale response
-              if (searchContainer) searchContainer.classList.remove("search-loading");
-              if (!data || !data.results || data.results.length === 0) return;
-              if (data.results.length > movieResults.length + seriesResults.length) {
-                renderSearchResults(query, data.results, []);
-              }
-            })
-            .catch(function () {
-              if (searchContainer) searchContainer.classList.remove("search-loading");
-              // Graceful degradation: keep client-side results
-            });
-        }
-
-        function initSearch() {
-          var input = document.getElementById("searchInput");
-          var clearBtn = document.getElementById("searchClear");
-          if (!input) return;
-
-          initSearchFuses();
-
-          input.addEventListener("input", function () {
-            cancelSearch();
-            searchDebounce = setTimeout(function () {
-              performSearch(input.value);
-            }, 300);
-          });
-
-          input.addEventListener("keydown", function (e) {
-            if (e.key === "Escape") {
-              restoreDefaultView();
-              input.blur();
-            }
-          });
-
-          var form = document.getElementById("searchForm");
-          if (form) {
-            form.addEventListener("submit", function () {
-              performSearch(input.value);
-            });
-          }
-
-          if (clearBtn) {
-            clearBtn.addEventListener("click", function () {
-              restoreDefaultView();
-              input.focus();
-            });
-          }
-        }
-
         /* ─── GENRE CHIPS MODULE ─── */
         DOM.genreChips.forEach(function (chip) {
           chip.addEventListener("click", function () {
@@ -787,7 +641,6 @@
         bindDots();
         resetTimer();
         init();
-        initSearch();
       })();
     </script>
   </body>
