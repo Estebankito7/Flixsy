@@ -177,3 +177,43 @@ def movie_api_json(request: HttpRequest, imdb_id: str) -> JsonResponse:
     movie["title"] = movie.get("primaryTitle", movie.get("title", ""))
 
     return JsonResponse(movie)
+
+
+@require_GET
+def search_movies(request: HttpRequest) -> JsonResponse:
+    q = request.GET.get("q", "").strip()
+    if len(q) < 2:
+        return JsonResponse({"results": [], "query": q})
+
+    cache_key = f"search_cache:{q.lower()}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return JsonResponse({"results": cached, "query": q})
+
+    try:
+        r = requests.get(
+            f"{IMDB_API_BASE}/search/{requests.utils.quote(q)}",
+            headers=HEADERS,
+            timeout=10,
+        )
+        _raise_for_auth(r)
+        if r.ok:
+            raw = r.json()
+            results = [
+                {
+                    "id": item.get("id", ""),
+                    "title": item.get("primaryTitle", item.get("title", "")),
+                    "primaryImage": item.get("primaryImage", ""),
+                    "averageRating": item.get("averageRating"),
+                    "genres": item.get("genres", []),
+                    "startYear": item.get("startYear"),
+                    "description": item.get("description", ""),
+                }
+                for item in (raw if isinstance(raw, list) else raw.get("results", []))
+            ]
+            cache.set(cache_key, results, 300)
+            return JsonResponse({"results": results, "query": q})
+    except requests.RequestException:
+        pass
+
+    return JsonResponse({"results": [], "query": q})
