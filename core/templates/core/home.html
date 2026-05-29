@@ -12,6 +12,7 @@
     />
     {% load static %}
     <link rel="stylesheet" href="{% static 'core/style.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
   </head>
   <body>
     <nav class="nav-rail" role="navigation" aria-label="Main">
@@ -146,7 +147,7 @@
 
     <div class="main">
       <div class="topbar">
-        <div class="topbar-search">
+        <div class="topbar-search" id="searchContainer">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -156,7 +157,15 @@
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
-          <input type="text" placeholder="Search movies, shows, genres…" />
+          <form id="searchForm" autocomplete="off">
+            <input
+              type="text"
+              id="searchInput"
+              name="q"
+              placeholder="Search movies, shows, genres…"
+            />
+          </form>
+          <button id="searchClear" class="search-clear" aria-label="Clear search" style="display:none;">&times;</button>
         </div>
         <div class="topbar-actions">
           <button aria-label="Notifications">
