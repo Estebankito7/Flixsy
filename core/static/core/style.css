@@ -183,23 +183,30 @@ h1, h2, h3, h4 { text-wrap: balance; margin: 0; }
 .search-clear {
   background: none;
   border: none;
-  color: var(--color-text-secondary, #94a3b8);
+  color: var(--fg-secondary);
   font-size: 1.4rem;
   cursor: pointer;
   padding: 0 8px;
   line-height: 1;
 }
 .search-clear:hover {
-  color: var(--color-text, #f1f5f9);
+  color: var(--fg);
 }
 .search-results-header {
   padding: 24px 32px 8px;
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--color-text, #f1f5f9);
+  color: var(--fg);
 }
 .search-results-header .search-count {
-  color: var(--color-text-secondary, #94a3b8);
+  color: var(--fg-secondary);
   font-weight: 400;
   font-size: 0.9rem;
+}
+.topbar-search.search-loading svg {
+  animation: searchPulse 0.8s ease-in-out infinite;
+}
+@keyframes searchPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
