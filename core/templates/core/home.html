@@ -603,14 +603,28 @@
         var searchDebounce = null;
         var searchActive = false;
         var searchResultsHeader = null;
+        var searchRequestId = 0;
+        var searchMovieFuse = null;
+        var searchSeriesFuse = null;
 
-        function buildFuse(data) {
-          return new Fuse(data || [], {
+        function initSearchFuses() {
+          searchMovieFuse = new Fuse(state.moviesCache, {
             keys: ["title", "primaryTitle"],
             threshold: 0.4,
             ignoreLocation: true,
             minMatchCharLength: 2,
           });
+          searchSeriesFuse = new Fuse(state.seriesCache, {
+            keys: ["title", "primaryTitle"],
+            threshold: 0.4,
+            ignoreLocation: true,
+            minMatchCharLength: 2,
+          });
+        }
+
+        function cancelSearch() {
+          clearTimeout(searchDebounce);
+          searchRequestId++;
         }
 
         function renderSearchResults(query, localMovies, localSeries) {
@@ -644,6 +658,7 @@
         }
 
         function restoreDefaultView() {
+          cancelSearch();
           searchActive = false;
           var hero = document.querySelector(".hero-section");
           var genres = document.querySelector(".genre-strip");
@@ -652,8 +667,10 @@
           if (searchResultsHeader) searchResultsHeader.style.display = "none";
           fillRow(DOM.moviesRow, state.moviesCache);
           fillRow(DOM.seriesRow, state.seriesCache);
-          document.getElementById("searchInput").value = "";
-          document.getElementById("searchClear").style.display = "none";
+          var inp = document.getElementById("searchInput");
+          if (inp) inp.value = "";
+          var cb = document.getElementById("searchClear");
+          if (cb) cb.style.display = "none";
         }
 
         function performSearch(query) {
@@ -668,11 +685,11 @@
 
           if (clearBtn) clearBtn.style.display = "block";
 
+          var rid = ++searchRequestId;
+
           // Client-side: fuzzy match on cached data
-          var movieFuse = buildFuse(state.moviesCache);
-          var seriesFuse = buildFuse(state.seriesCache);
-          var movieResults = movieFuse.search(query).map(function (r) { return r.item; });
-          var seriesResults = seriesFuse.search(query).map(function (r) { return r.item; });
+          var movieResults = searchMovieFuse ? searchMovieFuse.search(query).map(function (r) { return r.item; }) : [];
+          var seriesResults = searchSeriesFuse ? searchSeriesFuse.search(query).map(function (r) { return r.item; }) : [];
           renderSearchResults(query, movieResults, seriesResults);
 
           // Server-side: fetch full catalog from RapidAPI via Django
@@ -680,7 +697,7 @@
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (data) {
               if (!data || !data.results || data.results.length === 0) return;
-              // If server returned more results than local cache, use them
+              if (rid !== searchRequestId) return; // stale response
               if (data.results.length > movieResults.length + seriesResults.length) {
                 renderSearchResults(query, data.results, []);
               }
@@ -695,8 +712,10 @@
           var clearBtn = document.getElementById("searchClear");
           if (!input) return;
 
+          initSearchFuses();
+
           input.addEventListener("input", function () {
-            clearTimeout(searchDebounce);
+            cancelSearch();
             searchDebounce = setTimeout(function () {
               performSearch(input.value);
             }, 300);
