@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "gitCommitHash": "fbbe508f4fa110f71a24dbc47c326b697a3e3f73",
-  "generatedAt": "2026-05-29T18:00:00.689Z",
+  "gitCommitHash": "962640f404a3fd1798ad9fca88b9bc0f88c2bba9",
+  "generatedAt": "2026-05-29T21:15:19.413Z",
   "files": {
     ".understand-anything/.understandignore": {
       "filePath": ".understand-anything/.understandignore",
@@ -11,6 +11,46 @@
       "imports": [],
       "exports": [],
       "totalLines": 23,
+      "hasStructuralAnalysis": false
+    },
+    ".understand-anything/fingerprints.json": {
+      "filePath": ".understand-anything/fingerprints.json",
+      "contentHash": "f0bd4f3d880108036106c0e7d4293e7ecbc197edbbb5360fbeb6b26e01791a2d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 523,
+      "hasStructuralAnalysis": true
+    },
+    ".understand-anything/knowledge-graph.json": {
+      "filePath": ".understand-anything/knowledge-graph.json",
+      "contentHash": "b73abd11c3b3a498df966c111958fcdebb678690acf214bfcb20ef53e2beb72a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1625,
+      "hasStructuralAnalysis": true
+    },
+    ".understand-anything/meta.json": {
+      "filePath": ".understand-anything/meta.json",
+      "contentHash": "3571a4767f729460438280c957d1131e1c84e9802ab441147d1a77369734e96e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 9,
+      "hasStructuralAnalysis": true
+    },
+    ".understand-anything/tmp/changed-files.txt": {
+      "filePath": ".understand-anything/tmp/changed-files.txt",
+      "contentHash": "442d8068676d57e550c8b62b7b4bbe005bca50d454a62441c04f64d9d5eb469b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 21,
       "hasStructuralAnalysis": false
     },
     "config/__init__.py": {
@@ -250,14 +290,129 @@
       "totalLines": 21,
       "hasStructuralAnalysis": true
     },
-    "core/static/core/css/detail.css": {
-      "filePath": "core/static/core/css/detail.css",
-      "contentHash": "6cb983fcf663c1b1f53157a8420dfde00ce2c2ea2947aaf24a2e66f08fa52641",
+    "core/services.py": {
+      "filePath": "core/services.py",
+      "contentHash": "b7b926a35252469527c4606bbf326571e64f8878147067cd551fca9e196a2e0e",
+      "functions": [
+        {
+          "name": "_get_search_catalog",
+          "params": [
+            "client"
+          ],
+          "returnType": "list[dict]",
+          "exported": true,
+          "lineCount": 20
+        }
+      ],
+      "classes": [
+        {
+          "name": "IMDBConfig",
+          "methods": [
+            "headers"
+          ],
+          "properties": [
+            "base_url",
+            "host",
+            "key",
+            "timeout"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "IMDBError",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "AuthError",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "NotFoundError",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "IMDBClient",
+          "methods": [
+            "__init__",
+            "_raise_for_auth",
+            "_get",
+            "_normalize_title",
+            "fetch_movies",
+            "fetch_movie_by_id",
+            "fetch_popular",
+            "search"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 103
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass",
+            "field"
+          ]
+        },
+        {
+          "source": "requests",
+          "specifiers": [
+            "requests"
+          ]
+        },
+        {
+          "source": "django.core.cache",
+          "specifiers": [
+            "cache"
+          ]
+        }
+      ],
+      "exports": [
+        "IMDBConfig",
+        "IMDBError",
+        "AuthError",
+        "NotFoundError",
+        "IMDBClient",
+        "_get_search_catalog"
+      ],
+      "totalLines": 175,
+      "hasStructuralAnalysis": true
+    },
+    "core/static/core/css/base.css": {
+      "filePath": "core/static/core/css/base.css",
+      "contentHash": "755131118b2eadec95837400da6fa990e211b8c865e135c02358cacf37f933e8",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 216,
+      "totalLines": 110,
+      "hasStructuralAnalysis": false
+    },
+    "core/static/core/css/detail.css": {
+      "filePath": "core/static/core/css/detail.css",
+      "contentHash": "aef8defb95a1062964d7052f81134015c91204ba6e05cb4498578f80de2ada71",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 118,
       "hasStructuralAnalysis": false
     },
     "core/static/core/js/detail.js": {
@@ -270,49 +425,59 @@
       "totalLines": 220,
       "hasStructuralAnalysis": true
     },
-    "core/static/core/style.css": {
-      "filePath": "core/static/core/style.css",
-      "contentHash": "786491a2e136c70e2f767455f65c2e5eda276a622704311dae04762568869371",
+    "core/static/core/js/home.js": {
+      "filePath": "core/static/core/js/home.js",
+      "contentHash": "55fcbd6819239578952a3a5899b7c85b96407c42d7b058007846622699025352",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 181,
+      "totalLines": 271,
+      "hasStructuralAnalysis": true
+    },
+    "core/static/core/style.css": {
+      "filePath": "core/static/core/style.css",
+      "contentHash": "e78f91858b4e568688a9fbd1657a9f212d5a6f679814907f515aeb6e3b6d8ad5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 84,
       "hasStructuralAnalysis": false
     },
     "core/templates/core/detail.html": {
       "filePath": "core/templates/core/detail.html",
-      "contentHash": "8edb6e72adf3b4c6aeeb599691b2928d680739ad77cabfae2f14e82c4a98d94d",
+      "contentHash": "7dc56081b2eb143d326a9ee23b7eab464ab31633b832ff1fc2c5d7efb7da8b42",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 220,
+      "totalLines": 201,
       "hasStructuralAnalysis": false
     },
     "core/templates/core/home.html": {
       "filePath": "core/templates/core/home.html",
-      "contentHash": "6d3802dfd04387004b85eafb3c1da5e5e2b217a0f16a61ae48aa6afcecbd2583",
+      "contentHash": "2e7583650cc7035659aad2af7a7d4fefeeb0db86ef2f7bf272891b3e942ab638",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 651,
+      "totalLines": 308,
       "hasStructuralAnalysis": false
     },
-    "core/templates/core/template.html": {
-      "filePath": "core/templates/core/template.html",
-      "contentHash": "f23803dc865b684e04e7837b706f41da1981d92fd22768c277add2309b9d4d48",
+    "core/templates/core/search_results.html": {
+      "filePath": "core/templates/core/search_results.html",
+      "contentHash": "abc10b8f9bda7e6095c9718b6587055e34a22e7b48def49022370415a7c0ad23",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 864,
+      "totalLines": 249,
       "hasStructuralAnalysis": false
     },
     "core/urls.py": {
       "filePath": "core/urls.py",
-      "contentHash": "8e705a3b8962afe58e4d4c65eff8f4aff11d68a3b74562b9ee78b90ca7df0dcd",
+      "contentHash": "8cbc2601671ee7da518ade036dc22084f0de93bea604e69b3ec343da147dd617",
       "functions": [],
       "classes": [],
       "imports": [
@@ -330,38 +495,13 @@
         }
       ],
       "exports": [],
-      "totalLines": 13,
+      "totalLines": 15,
       "hasStructuralAnalysis": true
     },
     "core/views.py": {
       "filePath": "core/views.py",
-      "contentHash": "72fe2be9c0bb8c16b023a64fc203c32fb1fde8e89d392ca4ed3d19bf8bc631ff",
+      "contentHash": "d60bd87877854e6060fd61c57bcbb210821cac2b7ec957d01d0be2f8b14d29c2",
       "functions": [
-        {
-          "name": "_raise_for_auth",
-          "params": [
-            "response"
-          ],
-          "returnType": "None",
-          "exported": true,
-          "lineCount": 7
-        },
-        {
-          "name": "_fetch_movies",
-          "params": [],
-          "returnType": "list[dict]",
-          "exported": true,
-          "lineCount": 20
-        },
-        {
-          "name": "_fetch_movie_by_id",
-          "params": [
-            "imdb_id"
-          ],
-          "returnType": "dict | None",
-          "exported": true,
-          "lineCount": 21
-        },
         {
           "name": "_get_cached_movies",
           "params": [],
@@ -380,6 +520,24 @@
           "lineCount": 6
         },
         {
+          "name": "_lookup_movie",
+          "params": [
+            "imdb_id"
+          ],
+          "returnType": "dict | None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "_enrich_series",
+          "params": [
+            "movie"
+          ],
+          "returnType": "tuple[bool, int | None, int | None]",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
           "name": "movie_detail_imdb",
           "params": [
             "request",
@@ -387,7 +545,7 @@
           ],
           "returnType": "HttpResponse",
           "exported": true,
-          "lineCount": 26
+          "lineCount": 15
         },
         {
           "name": "movie_api_json",
@@ -397,7 +555,25 @@
           ],
           "returnType": "JsonResponse",
           "exported": true,
-          "lineCount": 28
+          "lineCount": 15
+        },
+        {
+          "name": "search_results",
+          "params": [
+            "request"
+          ],
+          "returnType": "HttpResponse",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "search_api",
+          "params": [
+            "request"
+          ],
+          "returnType": "JsonResponse",
+          "exported": true,
+          "lineCount": 4
         }
       ],
       "classes": [
@@ -408,22 +584,10 @@
           ],
           "properties": [],
           "exported": true,
-          "lineCount": 9
+          "lineCount": 11
         }
       ],
       "imports": [
-        {
-          "source": "os",
-          "specifiers": [
-            "os"
-          ]
-        },
-        {
-          "source": "requests",
-          "specifiers": [
-            "requests"
-          ]
-        },
         {
           "source": "django.core.cache",
           "specifiers": [
@@ -462,19 +626,47 @@
           "specifiers": [
             "Item"
           ]
+        },
+        {
+          "source": ".services",
+          "specifiers": [
+            "IMDBClient",
+            "IMDBConfig"
+          ]
         }
       ],
       "exports": [
-        "_raise_for_auth",
-        "_fetch_movies",
-        "_fetch_movie_by_id",
         "_get_cached_movies",
         "HomeView",
         "movie_detail",
+        "_lookup_movie",
+        "_enrich_series",
         "movie_detail_imdb",
-        "movie_api_json"
+        "movie_api_json",
+        "search_results",
+        "search_api"
       ],
-      "totalLines": 178,
+      "totalLines": 115,
+      "hasStructuralAnalysis": true
+    },
+    "docs/superpowers/plans/2026-05-29-search-function-implementation.md": {
+      "filePath": "docs/superpowers/plans/2026-05-29-search-function-implementation.md",
+      "contentHash": "fba85be7c104722f35b623e99c3e9d5288b2e6c85c41b8051bc03a2ea943cd9f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 393,
+      "hasStructuralAnalysis": true
+    },
+    "docs/superpowers/specs/2026-05-29-search-function-design.md": {
+      "filePath": "docs/superpowers/specs/2026-05-29-search-function-design.md",
+      "contentHash": "3fd7d4e941aaca483e44a74b8584ceb8f89014a30477a0ddbb37fba124f5f8ae",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 122,
       "hasStructuralAnalysis": true
     },
     "manage.py": {
@@ -509,14 +701,24 @@
       "totalLines": 23,
       "hasStructuralAnalysis": true
     },
-    "README.md": {
-      "filePath": "README.md",
-      "contentHash": "a9c067679c496b17e5591533aad0f65f71319dc1ca8f9c2925ebf7162de4aeb4",
+    "pyproject.toml": {
+      "filePath": "pyproject.toml",
+      "contentHash": "533d17da34d0b72bdfe5e1cc5ab24b6a7ae358b7fc11a06319da1d0d4e2e1115",
       "functions": [],
       "classes": [],
       "imports": [],
       "exports": [],
-      "totalLines": 4,
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "61645b59fae33c07e7239ba46464abc35d6970c9202d8644b0c69d2b635f6442",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 121,
       "hasStructuralAnalysis": true
     }
   }

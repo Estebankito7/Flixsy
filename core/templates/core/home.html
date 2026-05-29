@@ -11,135 +11,56 @@
       rel="stylesheet"
     />
     {% load static %}
+    <link rel="stylesheet" href="{% static 'core/css/base.css' %}" />
     <link rel="stylesheet" href="{% static 'core/style.css' %}" />
   </head>
   <body>
     <nav class="nav-rail" role="navigation" aria-label="Main">
       <div class="nav-rail-header">
-        <div class="nav-rail-logo">F</div>
-        <span class="nav-rail-brand">Flaire</span>
+        <div class="nav-rail-logo">J</div>
+        <span class="nav-rail-brand">Juan</span>
       </div>
       <div class="nav-rail-items">
-        <button class="nav-rail-item active" data-nav="home">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-          >
-            <path
-              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-            />
+        <a href="{% url 'core:home' %}" class="nav-rail-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
           </svg>
           <span class="nav-rail-label">Home</span>
-        </button>
-        <button class="nav-rail-item" data-nav="explore">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
+        </a>
+        <a href="{% url 'core:search' %}" class="nav-rail-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
           </svg>
-          <span class="nav-rail-label">Explore</span>
-        </button>
-        <button class="nav-rail-item" data-nav="library">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-          >
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <path d="M9 3v18M15 3v18" />
+          <span class="nav-rail-label">Search</span>
+        </a>
+        <button class="nav-rail-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/>
           </svg>
-          <span class="nav-rail-label">Library</span>
-        </button>
-        <button class="nav-rail-item" data-nav="downloads">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-          >
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          <span class="nav-rail-label">Downloads</span>
-        </button>
-      </div>
-      <div class="nav-rail-footer">
-        <button class="nav-rail-item" data-nav="settings">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-          >
-            <circle cx="12" cy="12" r="3" />
-            <path
-              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"
-            />
-          </svg>
-          <span class="nav-rail-label">Settings</span>
+          <span class="nav-rail-label">Saved</span>
         </button>
       </div>
     </nav>
 
     <nav class="bottom-nav" role="navigation" aria-label="Main">
       <div class="bottom-nav-inner">
-        <button class="bottom-nav-item active">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-          >
-            <path
-              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-            />
+        <a href="{% url 'core:home' %}" class="bottom-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
           </svg>
           <span>Home</span>
-        </button>
-        <button class="bottom-nav-item">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
+        </a>
+        <a href="{% url 'core:search' %}" class="bottom-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
           </svg>
-          <span>Explore</span>
-        </button>
+          <span>Search</span>
+        </a>
         <button class="bottom-nav-item">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-          >
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <path d="M9 3v18M15 3v18" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/>
           </svg>
-          <span>Library</span>
-        </button>
-        <button class="bottom-nav-item">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-          >
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          <span>Downloads</span>
+          <span>Saved</span>
         </button>
       </div>
     </nav>
@@ -156,7 +77,17 @@
             <circle cx="11" cy="11" r="8" />
             <path d="M21 21l-4.35-4.35" />
           </svg>
-          <input type="text" placeholder="Search movies, shows, genres…" />
+          <form
+            action="{% url 'core:search' %}"
+            method="GET"
+            autocomplete="off"
+          >
+            <input
+              type="text"
+              name="q"
+              placeholder="Search movies, shows, genres…"
+            />
+          </form>
         </div>
         <div class="topbar-actions">
           <button aria-label="Notifications">
@@ -365,285 +296,6 @@
       </div>
     </div>
 
-    <script>
-      (function () {
-        "use strict";
-
-        /* ─── CONFIG & STATE ─── */
-        var API = {
-          BASE: "https://imdb236.p.rapidapi.com",
-          MOVIES: "/api/imdb/most-popular-movies",
-          SERIES: "/api/imdb/most-popular-tv",
-          HEADERS: {
-            "Content-Type": "application/json",
-            "x-rapidapi-host": "{{ rapidapi_host }}",
-            "x-rapidapi-key": "{{ rapidapi_key }}",
-          },
-          HERO_COUNT: 5,
-          SLIDE_MS: 5500,
-        };
-
-        var DOM = {
-          heroSlides: document.getElementById("heroSlides"),
-          heroDots: document.getElementById("heroDots"),
-          moviesRow: document.getElementById("moviesRow"),
-          moviesSection: document.querySelector('[data-od-id="movies"]'),
-          seriesRow: document.getElementById("seriesRow"),
-          seriesSection: document.querySelector('[data-od-id="series"]'),
-          genreChips: document.querySelectorAll(".chip"),
-        };
-
-        var state = {
-          slideIdx: 0,
-          slideTimer: null,
-          moviesCache: [],
-          seriesCache: [],
-        };
-
-        /* ─── API SERVICE ─── */
-        async function fetchFromIMDb(endpoint, params) {
-          var url = API.BASE + endpoint;
-          if (params) {
-            var qs = Object.keys(params)
-              .map(function (k) {
-                return (
-                  encodeURIComponent(k) + "=" + encodeURIComponent(params[k])
-                );
-              })
-              .join("&");
-            url += "?" + qs;
-          }
-          var r = await fetch(url, { headers: API.HEADERS });
-          if (!r.ok) throw new Error("IMDb " + r.status);
-          return r.json();
-        }
-
-        /* ─── UI RENDERERS ─── */
-        function esc(str) {
-          var d = document.createElement("div");
-          d.textContent = String(str);
-          return d.innerHTML;
-        }
-
-        function imdbLink(id) {
-          return "tt" + (id || "").replace(/^tt/, "");
-        }
-
-        function createMediaCard(item) {
-          var lid = imdbLink(item.id);
-          return (
-            '<div class="media-card">' +
-            '<a href="/detail/' +
-            lid +
-            '/">' +
-            '<div class="media-card-thumb" style="position:relative;overflow:hidden;">' +
-            (item.primaryImage
-              ? '<img src="' +
-                esc(item.primaryImage) +
-                '" alt="' +
-                esc(item.title) +
-                '" style="object-fit:cover;position:absolute;inset:0;width:100%;height:100%;" loading="lazy">'
-              : '<div class="card-icon"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>') +
-            "</div>" +
-            '<div class="media-card-info"><h3>' +
-            esc(item.title) +
-            "</h3></div>" +
-            "</a></div>"
-          );
-        }
-
-        function slideHTML(m) {
-          var gs = (m.genres || []).slice(0, 2);
-          var lid = imdbLink(m.id);
-          return (
-            '<div class="hero-slide">' +
-            '<div class="hero-slide-bg" style="background:linear-gradient(135deg,#111827,#1e293b);">' +
-            (m.primaryImage
-              ? '<img src="' + esc(m.primaryImage) + '" alt="" loading="lazy">'
-              : "") +
-            "</div>" +
-            '<div class="hero-slide-content">' +
-            '<span class="eyebrow">&#9679; Now Streaming</span>' +
-            "<h1>" +
-            esc(m.title) +
-            "</h1>" +
-            '<div class="meta-row">' +
-            (m.startYear
-              ? '<span class="badge">' + esc(m.startYear) + "</span>"
-              : "") +
-            '<span class="rating"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' +
-            (m.averageRating || "N/A") +
-            "</span>" +
-            gs
-              .map(function (g) {
-                return '<span class="badge">' + esc(g) + "</span>";
-              })
-              .join("") +
-            "</div>" +
-            '<p class="desc">' +
-            esc(m.description || "") +
-            "</p>" +
-            '<div class="hero-actions">' +
-            '<a href="/detail/' +
-            lid +
-            '/" class="btn-primary"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Play</a>' +
-            '<a href="/detail/' +
-            lid +
-            '/" class="btn-secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>More Info</a>' +
-            "</div></div></div>"
-          );
-        }
-
-        function buildHero(movies) {
-          DOM.heroSlides.innerHTML = movies.map(slideHTML).join("");
-          DOM.heroDots.innerHTML = movies
-            .map(function (_, i) {
-              return (
-                '<span class="hero-dot' +
-                (i === 0 ? " active" : "") +
-                '" data-index="' +
-                i +
-                '"></span>'
-              );
-            })
-            .join("");
-          state.slideIdx = 0;
-          DOM.heroSlides.style.transform = "translateX(0)";
-          bindDots();
-          resetTimer();
-        }
-
-        function goTo(i) {
-          var slides = DOM.heroSlides.children;
-          if (i === state.slideIdx || !slides.length) return;
-          state.slideIdx = i;
-          DOM.heroSlides.style.transform = "translateX(-" + i * 100 + "%)";
-          var dots = document.querySelectorAll(".hero-dot");
-          for (var j = 0; j < dots.length; j++) {
-            dots[j].classList.toggle("active", j === i);
-          }
-          resetTimer();
-        }
-
-        function nextSlide() {
-          var c = DOM.heroSlides.children.length;
-          if (c) goTo((state.slideIdx + 1) % c);
-        }
-
-        function resetTimer() {
-          clearInterval(state.slideTimer);
-          state.slideTimer = setInterval(nextSlide, API.SLIDE_MS);
-        }
-
-        function bindDots() {
-          document.querySelectorAll(".hero-dot").forEach(function (d) {
-            d.addEventListener("click", function () {
-              goTo(parseInt(this.dataset.index));
-            });
-          });
-        }
-
-        function fillRow(container, items) {
-          if (!container) return;
-          var section = container.closest("[data-od-id]");
-          if (!items || !items.length) {
-            if (section && section.isConnected) section.remove();
-            return;
-          }
-          if (section && !section.isConnected) {
-            var ref = document.querySelector(".genre-strip");
-            if (ref) ref.after(section);
-          }
-          container.innerHTML = items.map(createMediaCard).join("");
-        }
-
-        /* ─── CORE INIT ─── */
-        function normalize(items) {
-          return (items || []).map(function (m) {
-            return Object.assign({}, m, { title: m.primaryTitle });
-          });
-        }
-
-        async function loadMovies() {
-          var raw = await fetchFromIMDb(API.MOVIES);
-          if (!Array.isArray(raw)) throw new Error("Invalid movies response");
-          state.moviesCache = normalize(raw);
-          var heroSet = state.moviesCache.filter(function (m) {
-            return m.primaryImage;
-          });
-          if (heroSet.length) buildHero(heroSet.slice(0, API.HERO_COUNT));
-          fillRow(DOM.moviesRow, state.moviesCache);
-        }
-
-        async function loadSeries() {
-          var raw = await fetchFromIMDb(API.SERIES);
-          if (!Array.isArray(raw)) throw new Error("Invalid series response");
-          state.seriesCache = normalize(raw);
-          fillRow(DOM.seriesRow, state.seriesCache);
-        }
-
-        async function init() {
-          try {
-            await Promise.all([loadMovies(), loadSeries()]);
-          } catch (e) {
-            console.warn("IMDb API unavailable", e);
-          }
-        }
-
-        /* ─── SEARCH MODULE (PLACEHOLDER) ─── */
-        /*
-          To add independent search for movies or series:
-          1. Create a function here that reads from state.moviesCache / state.seriesCache
-          2. Filter by user query and call fillRow(DOM.moviesRow, filtered) or fillRow(DOM.seriesRow, filtered)
-          3. Wire it to an input event or a dedicated search endpoint via fetchFromIMDb()
-        */
-
-        /* ─── GENRE CHIPS MODULE ─── */
-        DOM.genreChips.forEach(function (chip) {
-          chip.addEventListener("click", function () {
-            DOM.genreChips.forEach(function (c) {
-              c.classList.remove("active");
-            });
-            this.classList.add("active");
-            var name = this.textContent.trim();
-            if (name === "All") {
-              fillRow(DOM.moviesRow, state.moviesCache);
-              return;
-            }
-            var filtered = state.moviesCache.filter(function (m) {
-              return (
-                m.genres &&
-                m.genres.some(function (g) {
-                  return g.toLowerCase() === name.toLowerCase();
-                })
-              );
-            });
-            fillRow(DOM.moviesRow, filtered);
-          });
-        });
-
-        /* ─── NAV MODULE ─── */
-        document
-          .querySelectorAll(".nav-rail-item, .bottom-nav-item")
-          .forEach(function (item) {
-            item.addEventListener("click", function () {
-              var parent =
-                this.closest(".nav-rail-items, .bottom-nav-inner") ||
-                this.parentNode;
-              parent
-                .querySelectorAll(".nav-rail-item, .bottom-nav-item")
-                .forEach(function (i) {
-                  i.classList.remove("active");
-                });
-              this.classList.add("active");
-            });
-          });
-
-        /* ─── BOOT ─── */
-        bindDots();
-        resetTimer();
-        init();
-      })();
-    </script>
+    <script src="{% static 'core/js/home.js' %}"></script>
   </body>
 </html>
