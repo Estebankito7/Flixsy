@@ -87,6 +87,17 @@
   margin-bottom: var(--gap-md);
 }
 
+.btn-stadium {
+  display: inline-flex; align-items: center; gap: var(--gap-xs);
+  padding: 12px 28px; border-radius: var(--radius-pill);
+  font-weight: 600; font-size: 15px; text-decoration: none;
+  border: 0; cursor: pointer;
+  transition: background var(--motion-base) var(--ease-out), transform 0.05s ease;
+}
+.btn-stadium.primary { background: var(--accent); color: var(--accent-on); }
+.btn-stadium.primary:hover { background: color-mix(in srgb, var(--accent) 88%, black); }
+.btn-stadium.primary:active { transform: translateY(1px); }
+
 .saved-empty h2 {
   font-size: var(--fs-h2);
   font-weight: 600;

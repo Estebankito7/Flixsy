@@ -12,13 +12,14 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="{% static 'core/css/base.css' %}" />
+    <link rel="stylesheet" href="{% static 'core/style.css' %}" />
     <link rel="stylesheet" href="{% static 'core/css/saved.css' %}" />
   </head>
   <body>
-    <nav class="nav-rail" aria-label="Main">
+    <nav class="nav-rail" role="navigation" aria-label="Main">
       <div class="nav-rail-header">
-        <a href="{% url 'core:home' %}" class="nav-rail-logo">F</a>
-        <span class="nav-rail-brand">Flaire</span>
+        <a href="{% url 'core:home' %}" class="nav-rail-logo">J</a>
+        <span class="nav-rail-brand">Juan</span>
       </div>
       <div class="nav-rail-items">
         <a href="{% url 'core:home' %}" class="nav-rail-item">
@@ -65,13 +66,15 @@
       </div>
     </nav>
 
-    <div class="page-wrapper">
-      <header class="topbar">
+    <div class="main">
+      <div class="topbar">
         <div class="topbar-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
           </svg>
-          <input type="text" placeholder="Search movies, shows, genres…" />
+          <form action="{% url 'core:search' %}" method="GET" autocomplete="off" style="flex:1">
+            <input type="text" name="q" placeholder="Search movies, shows, genres…" />
+          </form>
         </div>
         <div class="topbar-actions">
           <button aria-label="Notifications">
@@ -81,9 +84,7 @@
           </button>
           <div class="avatar">J</div>
         </div>
-      </header>
-
-      <main class="main">
+      </div>
         <div class="saved-wrap">
           <h1 class="saved-title">Saved</h1>
           <div id="savedGrid" class="saved-grid"></div>
@@ -96,8 +97,7 @@
             <a href="{% url 'core:home' %}" class="btn-stadium primary">Browse</a>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
 
     <script src="{% static 'core/js/saved.js' %}"></script>
   </body>
