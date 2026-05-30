@@ -31,6 +31,17 @@ def trending_api(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"results": results})
 
 
+def _resolve_movie(identifier: str) -> dict | None:
+    if identifier.startswith("tt"):
+        return tmdb.find_by_external_id(identifier)
+    try:
+        pk = int(identifier)
+        movie = tmdb.fetch_movie_by_id(pk)
+        return movie if movie else tmdb.fetch_tv_by_id(pk)
+    except ValueError:
+        return None
+
+
 def movie_detail(request: HttpRequest, pk: int) -> HttpResponse:
     movie = tmdb.fetch_movie_by_id(pk)
     if not movie:
@@ -41,17 +52,7 @@ def movie_detail(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 def movie_detail_imdb(request: HttpRequest, imdb_id: str) -> HttpResponse:
-    movie = None
-    if imdb_id.startswith("tt"):
-        movie = tmdb.find_by_external_id(imdb_id)
-    else:
-        try:
-            pk = int(imdb_id)
-            movie = tmdb.fetch_movie_by_id(pk)
-            if not movie:
-                movie = tmdb.fetch_tv_by_id(pk)
-        except ValueError:
-            pass
+    movie = _resolve_movie(imdb_id)
     if not movie:
         raise Http404("Movie not found")
     return render(request, "core/detail.html", {"movie": movie})
@@ -59,17 +60,7 @@ def movie_detail_imdb(request: HttpRequest, imdb_id: str) -> HttpResponse:
 
 @require_GET
 def movie_api_json(request: HttpRequest, imdb_id: str) -> JsonResponse:
-    movie = None
-    if imdb_id.startswith("tt"):
-        movie = tmdb.find_by_external_id(imdb_id)
-    else:
-        try:
-            pk = int(imdb_id)
-            movie = tmdb.fetch_movie_by_id(pk)
-            if not movie:
-                movie = tmdb.fetch_tv_by_id(pk)
-        except ValueError:
-            pass
+    movie = _resolve_movie(imdb_id)
     if not movie:
         return JsonResponse({"error": "Movie not found"}, status=404)
     movie["isSeries"] = movie.get("type", "") in ("series", "tv")
