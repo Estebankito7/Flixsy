@@ -64,7 +64,26 @@
 .media-card-info .meta-line { display: flex; align-items: center; gap: var(--gap-xs); font-size: var(--fs-small); color: var(--muted); }
 .media-card-info .meta-line .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
 
-.section-wrap { margin-bottom: var(--gap-xl); }
+.section-wrap { position: relative; margin-bottom: var(--gap-xl); }
+
+/* ─── Scroll Arrows ─── */
+.scroll-arrow {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px;
+  border: none; cursor: pointer; z-index: 2;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(0,0,0,0.6);
+  color: var(--fg);
+  opacity: 1;
+  transition: opacity 250ms var(--ease-out), background 200ms var(--ease-out);
+}
+.scroll-arrow:hover { background: var(--accent); color: var(--accent-on); }
+.scroll-arrow.hidden { opacity: 0; pointer-events: none; }
+.scroll-arrow.left  { left: 8px; }
+.scroll-arrow.right { right: 8px; }
+.scroll-arrow svg { width: 18px; height: 18px; }
 
 /* ─── Responsive (home-specific) ─── */
 @media (max-width: 1024px) {
