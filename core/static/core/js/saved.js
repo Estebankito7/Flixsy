@@ -1,3 +1,8 @@
+/* ─── Saved Watchlist ───
+ * Reads flixsy_saved from localStorage and renders a grid of cards.
+ * Each card links back to its detail page. Shows empty state when no items.
+ * ────────────────────────────────────────── */
+
 document.addEventListener('DOMContentLoaded', () => {
   const grid = document.getElementById('savedGrid');
   const empty = document.getElementById('savedEmpty');

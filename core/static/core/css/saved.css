@@ -79,13 +79,9 @@
   padding: var(--gap-2xl) var(--gap-xl);
   color: var(--fg-secondary);
 }
+.saved-empty[hidden] { display: none; }
 
-.saved-empty-icon {
-  width: 48px;
-  height: 48px;
-  color: var(--muted);
-  margin-bottom: var(--gap-md);
-}
+/* ─── Empty state CTA button ─── */
 
 .btn-stadium {
   display: inline-flex; align-items: center; gap: var(--gap-xs);
@@ -97,6 +93,13 @@
 .btn-stadium.primary { background: var(--accent); color: var(--accent-on); }
 .btn-stadium.primary:hover { background: color-mix(in srgb, var(--accent) 88%, black); }
 .btn-stadium.primary:active { transform: translateY(1px); }
+
+.saved-empty-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--muted);
+  margin-bottom: var(--gap-md);
+}
 
 .saved-empty h2 {
   font-size: var(--fs-h2);

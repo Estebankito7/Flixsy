@@ -30,6 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const mediaColumn = document.getElementById('mediaColumn');
 
+  /* ─── Saved items (localStorage) ─── */
+
+  let savedItems = (() => {
+    try { return JSON.parse(localStorage.getItem('flixsy_saved') || '[]'); } catch { return []; }
+  })();
+
   function getPlayButton() {
     return document.querySelector('.btn-stadium.primary');
   }
@@ -299,35 +305,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveIcon = document.getElementById('saveIcon');
     const saveLabel = document.getElementById('saveLabel');
     if (saveToggle) {
-      function updateSaveState() {
-        let saved;
-        try { saved = JSON.parse(localStorage.getItem('flixsy_saved') || '[]'); } catch { saved = []; }
-        const idx = saved.findIndex(s => String(s.id) === String(movie.id));
-        const isSaved = idx !== -1;
-        saveIcon.setAttribute('fill', isSaved ? 'currentColor' : 'none');
-        saveLabel.textContent = isSaved ? 'Saved' : 'Save';
-      }
-      updateSaveState();
+      const isSaved = savedItems.some(s => String(s.id) === String(movie.id));
+      saveIcon.setAttribute('fill', isSaved ? 'currentColor' : 'none');
+      saveLabel.textContent = isSaved ? 'Saved' : 'Save';
+
       saveToggle.addEventListener('click', () => {
-        let saved;
-        try { saved = JSON.parse(localStorage.getItem('flixsy_saved') || '[]'); } catch { saved = []; }
-        const idx = saved.findIndex(s => String(s.id) === String(movie.id));
-        if (idx !== -1) {
-          saved.splice(idx, 1);
+        const wasSaved = savedItems.some(s => String(s.id) === String(movie.id));
+        if (wasSaved) {
+          savedItems = savedItems.filter(s => String(s.id) !== String(movie.id));
         } else {
-          saved.push({
-            id: movie.id,
-            imdb_id: movie.imdb_id || '',
-            title: movie.title || '',
-            type: movie.type || '',
-            primaryImage: movie.primaryImage || '',
-            startYear: movie.startYear || '',
-            averageRating: movie.averageRating || '',
+          savedItems.push({
+            id: movie.id, imdb_id: movie.imdb_id || '', title: movie.title || '',
+            type: movie.type || '', primaryImage: movie.primaryImage || '',
+            startYear: movie.startYear || '', averageRating: movie.averageRating || '',
             savedAt: new Date().toISOString(),
           });
         }
-        localStorage.setItem('flixsy_saved', JSON.stringify(saved));
-        updateSaveState();
+        localStorage.setItem('flixsy_saved', JSON.stringify(savedItems));
+        saveIcon.setAttribute('fill', wasSaved ? 'none' : 'currentColor');
+        saveLabel.textContent = wasSaved ? 'Save' : 'Saved';
       });
     }
   }

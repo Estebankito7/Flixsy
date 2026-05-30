@@ -88,4 +88,5 @@ def search_api(request: HttpRequest) -> JsonResponse:
 
 @require_GET
 def saved_list(request: HttpRequest) -> HttpResponse:
+    """Renders the saved watchlist page (data loaded client-side from localStorage)."""
     return render(request, "core/saved.html")
