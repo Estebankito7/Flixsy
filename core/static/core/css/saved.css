@@ -1,0 +1,111 @@
+.saved-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--gap-xl) var(--gap-xl) var(--gap-2xl);
+}
+
+.saved-title {
+  font-size: var(--fs-h1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--gap-lg);
+}
+
+.saved-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--gap-lg);
+}
+
+.saved-card {
+  display: block;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--surface);
+  transition: transform var(--motion-base) var(--ease-out);
+  text-decoration: none;
+  color: inherit;
+}
+
+.saved-card:hover {
+  transform: translateY(-4px);
+}
+
+.saved-card-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  background: var(--surface);
+}
+
+.saved-card-body {
+  padding: var(--gap-sm) var(--gap-md) var(--gap-md);
+}
+
+.saved-card-title {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  margin-bottom: var(--gap-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.saved-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  font-size: var(--fs-small);
+  color: var(--fg-secondary);
+}
+
+.saved-card-badge {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: var(--radius-pill);
+  padding: 1px 8px;
+  font-weight: 500;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.saved-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--gap-2xl) var(--gap-xl);
+  color: var(--fg-secondary);
+}
+
+.saved-empty-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--muted);
+  margin-bottom: var(--gap-md);
+}
+
+.saved-empty h2 {
+  font-size: var(--fs-h2);
+  font-weight: 600;
+  margin-bottom: var(--gap-sm);
+  color: var(--fg);
+}
+
+.saved-empty p {
+  font-size: var(--fs-body);
+  margin-bottom: var(--gap-lg);
+  max-width: 32ch;
+}
+
+@media (max-width: 720px) {
+  .saved-wrap {
+    padding: var(--gap-md);
+  }
+  .saved-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--gap-md);
+  }
+}
