@@ -220,7 +220,7 @@ class TMDBClient:
             media_type = "movie"
             imdb_id = data.get("imdb_id")
         release_date = data.get(date_key, "")
-        return {
+        result = {
             "id": data.get("id"),
             "primaryImage": (
                 f"{POSTER_BASE_URL}{data['poster_path']}"
@@ -240,6 +240,14 @@ class TMDBClient:
             "type": media_type,
             "imdb_id": imdb_id,
         }
+        if is_tv:
+            result["number_of_seasons"] = data.get("number_of_seasons", 0)
+            result["seasons"] = [
+                {"seasonNumber": s["season_number"], "episodeCount": s["episode_count"]}
+                for s in data.get("seasons", [])
+                if s.get("season_number", 0) > 0
+            ]
+        return result
 
     def search_movies(self, query: str, page: int = 1) -> list[dict]:
         cleaned = self._clean_query(query)

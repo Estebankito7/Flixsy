@@ -77,6 +77,23 @@
 .sidebar-block p, .sidebar-block .chip-list { font-size: var(--fs-body); color: var(--fg); }
 .chip-list { display: flex; flex-wrap: wrap; gap: var(--gap-xs); }
 
+/* ─── Season / Episode Selector ─── */
+.episode-selector {
+  display: flex; align-items: center; gap: var(--gap-sm);
+  padding: var(--gap-sm) 0; flex-wrap: wrap;
+}
+.episode-label {
+  font-size: var(--fs-small); font-weight: 500; color: var(--fg-secondary);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.episode-select {
+  padding: 6px 12px; border-radius: var(--radius-pill);
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--fg); font-family: var(--font-body); font-size: var(--fs-small);
+  cursor: pointer; outline: none;
+}
+.episode-select:focus-visible { border-color: var(--accent); }
+
 /* ─── Video Player ─── */
 .server-bar { display: flex; gap: var(--gap-sm); margin-bottom: var(--gap-sm); flex-wrap: wrap; }
 .server-bar .btn-stadium {
