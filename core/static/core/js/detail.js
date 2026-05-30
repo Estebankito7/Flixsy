@@ -293,6 +293,43 @@ document.addEventListener('DOMContentLoaded', () => {
     attachPlayer(playBtn);
 
     setupEpisodeSelector(movie);
+
+    /* Save / Unsave toggle */
+    const saveToggle = document.getElementById('saveToggle');
+    const saveIcon = document.getElementById('saveIcon');
+    const saveLabel = document.getElementById('saveLabel');
+    if (saveToggle) {
+      function updateSaveState() {
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem('flixsy_saved') || '[]'); } catch { saved = []; }
+        const idx = saved.findIndex(s => String(s.id) === String(movie.id));
+        const isSaved = idx !== -1;
+        saveIcon.setAttribute('fill', isSaved ? 'currentColor' : 'none');
+        saveLabel.textContent = isSaved ? 'Saved' : 'Save';
+      }
+      updateSaveState();
+      saveToggle.addEventListener('click', () => {
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem('flixsy_saved') || '[]'); } catch { saved = []; }
+        const idx = saved.findIndex(s => String(s.id) === String(movie.id));
+        if (idx !== -1) {
+          saved.splice(idx, 1);
+        } else {
+          saved.push({
+            id: movie.id,
+            imdb_id: movie.imdb_id || '',
+            title: movie.title || '',
+            type: movie.type || '',
+            primaryImage: movie.primaryImage || '',
+            startYear: movie.startYear || '',
+            averageRating: movie.averageRating || '',
+            savedAt: new Date().toISOString(),
+          });
+        }
+        localStorage.setItem('flixsy_saved', JSON.stringify(saved));
+        updateSaveState();
+      });
+    }
   }
 
   /* ─── Fetch ─── */
