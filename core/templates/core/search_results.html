@@ -46,7 +46,7 @@
           </svg>
           <span class="nav-rail-label">Search</span>
         </a>
-        <button class="nav-rail-item">
+        <a href="{% url 'core:saved' %}" class="nav-rail-item">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -57,7 +57,7 @@
             <path d="M9 3v18M15 3v18" />
           </svg>
           <span class="nav-rail-label">Saved</span>
-        </button>
+        </a>
       </div>
     </nav>
 
@@ -229,7 +229,7 @@
           </svg>
           <span>Search</span>
         </a>
-        <button class="bottom-nav-item">
+        <a href="{% url 'core:saved' %}" class="bottom-nav-item">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -240,7 +240,7 @@
             <path d="M9 3v18M15 3v18" />
           </svg>
           <span>Saved</span>
-        </button>
+        </a>
       </div>
     </nav>
   </body>
