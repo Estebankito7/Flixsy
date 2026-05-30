@@ -13,27 +13,39 @@ document.addEventListener('DOMContentLoaded', () => {
     return div.innerHTML;
   }
 
-  /* ─── Player (unchanged) ─── */
+  /* ─── Server definitions ─── */
 
-  const mediaColumn = document.getElementById('mediaColumn');
-
-  function getServerList(id, numericId, isTV, season, episode) {
-    if (isTV) {
-      return [
-        { name: 'VidSrc', url: `https://vidsrc.to/embed/tv/${id}/${season}/${episode}` },
-        { name: 'VidLink', url: `https://vidlink.org/embed/tv/${numericId}/${season}/${episode}` },
-        { name: 'VidFast', url: `https://vidfast.to/embed/tv/${id}/${season}/${episode}` },
-      ];
-    }
-    return [
+  const SERVERS = {
+    tv: (id, numericId, season, episode) => [
+      { name: 'VidSrc', url: `https://vidsrc.to/embed/tv/${id}/${season}/${episode}` },
+      { name: 'VidLink', url: `https://vidlink.org/embed/tv/${numericId}/${season}/${episode}` },
+      { name: 'VidFast', url: `https://vidfast.to/embed/tv/${id}/${season}/${episode}` },
+    ],
+    movie: (id, numericId) => [
       { name: 'VidSrc', url: `https://vidsrc.to/embed/movie/${id}` },
       { name: 'VidLink', url: `https://vidlink.org/embed/movie/${numericId}` },
       { name: 'VidFast', url: `https://www.vidfast.net/movie/${id}` },
-    ];
+    ],
+  };
+
+  const mediaColumn = document.getElementById('mediaColumn');
+
+  /* ─── Saved items (localStorage) ─── */
+
+  let savedItems = (() => {
+    try { return JSON.parse(localStorage.getItem('flixsy_saved') || '[]'); } catch { return []; }
+  })();
+
+  function getPlayButton() {
+    return document.querySelector('.btn-stadium.primary');
+  }
+
+  function isTVType(type) {
+    return (type || '').toLowerCase().includes('tv') || (type || '').toLowerCase().includes('series');
   }
 
   function createPlayerElement(id, type, season, episode) {
-    const isTV = (type || '').toLowerCase().includes('tv') || (type || '').toLowerCase().includes('series');
+    const isTV = isTVType(type);
     const numericId = id.replace(/^tt/, '');
     const container = document.createElement('div');
     container.id = 'playerContainer';
@@ -53,7 +65,10 @@ document.addEventListener('DOMContentLoaded', () => {
     wrapper.appendChild(iframe);
     player.appendChild(wrapper);
 
-    const servers = getServerList(id, numericId, isTV, season, episode);
+    const servers = isTV
+      ? SERVERS.tv(id, numericId, season, episode)
+      : SERVERS.movie(id, numericId);
+
     servers.forEach((server, index) => {
       const button = document.createElement('button');
       button.className = `btn-stadium${index === 0 ? ' active' : ''}`;
@@ -93,25 +108,43 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ─── Season / Episode Selector ─── */
 
   const episodeSelector = document.getElementById('episodeSelector');
-  let seasonSelect, episodeSelect;
+
+  function populateEpisodeSelect(selectEl, seasons, seasonNumber) {
+    const season = seasons.find(s => s.seasonNumber === seasonNumber);
+    const count = season ? season.episodeCount : 1;
+    selectEl.innerHTML = '';
+    for (let i = 1; i <= count; i++) {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = 'Episode ' + i;
+      if (i === 1) opt.selected = true;
+      selectEl.appendChild(opt);
+    }
+  }
+
+  function syncPlayButton(seasonEl, episodeEl) {
+    const btn = getPlayButton();
+    if (!btn) return;
+    btn.dataset.season = seasonEl.value;
+    btn.dataset.episode = episodeEl.value;
+  }
+
+  function reloadPlayerIfActive() {
+    const btn = getPlayButton();
+    if (btn && document.getElementById('playerContainer')) replacePlayer(btn);
+  }
 
   function setupEpisodeSelector(data) {
     if (!episodeSelector) return;
-    if (!data.isSeries) {
-      episodeSelector.hidden = true;
-      return;
-    }
+    if (!data.isSeries) { episodeSelector.hidden = true; return; }
 
     const seasons = data.seasons || [];
-    if (!seasons.length) {
-      episodeSelector.hidden = true;
-      return;
-    }
+    if (!seasons.length) { episodeSelector.hidden = true; return; }
 
     episodeSelector.innerHTML = '';
     episodeSelector.hidden = false;
 
-    seasonSelect = document.createElement('select');
+    const seasonSelect = document.createElement('select');
     seasonSelect.className = 'episode-select';
     seasonSelect.setAttribute('aria-label', 'Select season');
 
@@ -123,24 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
       seasonSelect.appendChild(opt);
     });
 
-    episodeSelect = document.createElement('select');
+    const episodeSelect = document.createElement('select');
     episodeSelect.className = 'episode-select';
     episodeSelect.setAttribute('aria-label', 'Select episode');
 
-    function populateEpisodes(seasonNumber) {
-      const season = seasons.find(s => s.seasonNumber === seasonNumber);
-      const count = season ? season.episodeCount : 1;
-      episodeSelect.innerHTML = '';
-      for (let i = 1; i <= count; i++) {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = 'Episode ' + i;
-        if (i === 1) opt.selected = true;
-        episodeSelect.appendChild(opt);
-      }
-    }
-
-    populateEpisodes(1);
+    populateEpisodeSelect(episodeSelect, seasons, 1);
 
     const seasonLabel = document.createElement('span');
     seasonLabel.className = 'episode-label';
@@ -154,24 +174,15 @@ document.addEventListener('DOMContentLoaded', () => {
     episodeSelector.appendChild(episodeLabel);
     episodeSelector.appendChild(episodeSelect);
 
-    function updateBtn() {
-      const btn = document.querySelector('.btn-stadium.primary');
-      if (!btn) return;
-      btn.dataset.season = seasonSelect.value;
-      btn.dataset.episode = episodeSelect.value;
-    }
-
     seasonSelect.addEventListener('change', () => {
-      populateEpisodes(parseInt(seasonSelect.value, 10));
-      updateBtn();
-      const btn = document.querySelector('.btn-stadium.primary');
-      if (btn && document.getElementById('playerContainer')) replacePlayer(btn);
+      populateEpisodeSelect(episodeSelect, seasons, parseInt(seasonSelect.value, 10));
+      syncPlayButton(seasonSelect, episodeSelect);
+      reloadPlayerIfActive();
     });
 
     episodeSelect.addEventListener('change', () => {
-      updateBtn();
-      const btn = document.querySelector('.btn-stadium.primary');
-      if (btn && document.getElementById('playerContainer')) replacePlayer(btn);
+      syncPlayButton(seasonSelect, episodeSelect);
+      reloadPlayerIfActive();
     });
   }
 
@@ -278,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* Re-attach player with fresh data */
-    const playBtn = document.querySelector('.btn-stadium.primary');
+    const playBtn = getPlayButton();
     if (playBtn) {
       playBtn.dataset.imdbId = movie.id || '';
       playBtn.dataset.type = movie.type || '';
@@ -287,8 +298,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     attachPlayer(playBtn);
 
-    /* Season / Episode selector (series only) */
     setupEpisodeSelector(movie);
+
+    /* Save / Unsave toggle */
+    const saveToggle = document.getElementById('saveToggle');
+    const saveIcon = document.getElementById('saveIcon');
+    const saveLabel = document.getElementById('saveLabel');
+    if (saveToggle) {
+      const isSaved = savedItems.some(s => String(s.id) === String(movie.id));
+      saveIcon.setAttribute('fill', isSaved ? 'currentColor' : 'none');
+      saveLabel.textContent = isSaved ? 'Saved' : 'Save';
+
+      saveToggle.addEventListener('click', () => {
+        const wasSaved = savedItems.some(s => String(s.id) === String(movie.id));
+        if (wasSaved) {
+          savedItems = savedItems.filter(s => String(s.id) !== String(movie.id));
+        } else {
+          savedItems.push({
+            id: movie.id, imdb_id: movie.imdb_id || '', title: movie.title || '',
+            type: movie.type || '', primaryImage: movie.primaryImage || '',
+            startYear: movie.startYear || '', averageRating: movie.averageRating || '',
+            savedAt: new Date().toISOString(),
+          });
+        }
+        localStorage.setItem('flixsy_saved', JSON.stringify(savedItems));
+        saveIcon.setAttribute('fill', wasSaved ? 'none' : 'currentColor');
+        saveLabel.textContent = wasSaved ? 'Save' : 'Saved';
+      });
+    }
   }
 
   /* ─── Fetch ─── */
@@ -306,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Flixsy detail API error:', err);
     });
 
-  /* Fallback: attach player even if fetch fails (SSR data already in the DOM) */
-  const existingBtn = document.querySelector('.btn-stadium.primary');
-  attachPlayer(existingBtn);
+  /* Fallback: attach player even if fetch fails */
+  attachPlayer(getPlayButton());
 });

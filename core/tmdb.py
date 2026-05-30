@@ -119,7 +119,7 @@ class TMDBClient:
                 f"{POSTER_BASE_URL}{item['poster_path']}"
                 if item.get("poster_path") else None
             ),
-            "title": item.get("title", ""),
+            "title": item.get("title") or item.get("name") or "",
             "averageRating": item.get("vote_average"),
             "startYear": (
                 item["release_date"][:4]
