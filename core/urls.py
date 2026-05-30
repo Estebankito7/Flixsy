@@ -12,4 +12,5 @@ urlpatterns = [
     path("api/trending/", views.trending_api, name="trending-api"),
     path("search/", views.search_results, name="search"),
     path("search/api/", views.search_api, name="search-api"),
+    path("saved/", views.saved_list, name="saved"),
 ]

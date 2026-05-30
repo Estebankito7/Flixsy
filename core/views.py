@@ -84,3 +84,8 @@ def search_api(request: HttpRequest) -> JsonResponse:
     q = request.GET.get("q", "").strip()
     results = tmdb.search_movies(q) if q else []
     return JsonResponse({"results": results, "query": q})
+
+
+@require_GET
+def saved_list(request: HttpRequest) -> HttpResponse:
+    return render(request, "core/saved.html")
