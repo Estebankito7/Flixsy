@@ -17,6 +17,8 @@
     play: '<polygon points="5 3 19 12 5 21 5 3" />',
     info: '<circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />',
     star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />',
+    chevronLeft: '<path d="M15 18l-6-6 6-6"/>',
+    chevronRight: '<path d="M9 18l6-6-6-6"/>',
   };
 
   function svg(viewBox, inner, fill) {
@@ -174,6 +176,76 @@
   }
 
   /* ========================================================================
+   * SCROLL ARROWS
+   * ======================================================================== */
+  /** Tracks all active arrow instances for visibility updates. */
+  const arrowState = [];
+
+  /** Returns the computed gap of a flex container in pixels. */
+  function getGap(element) {
+    const style = getComputedStyle(element);
+    return parseFloat(style.gap || style.columnGap || "0");
+  }
+
+  /** Toggles arrow visibility based on the row's scroll boundaries. */
+  function updateArrowVisibility(row, leftBtn, rightBtn) {
+    const { scrollLeft, scrollWidth, clientWidth } = row;
+    leftBtn.classList.toggle("hidden", scrollLeft <= 2);
+    rightBtn.classList.toggle("hidden", scrollLeft + clientWidth >= scrollWidth - 2);
+  }
+
+  /** Creates a scroll arrow button element. */
+  function createArrow(dir, label) {
+    const btn = document.createElement("button");
+    btn.className = "scroll-arrow " + dir;
+    btn.setAttribute("aria-label", label);
+    const icon = dir === "left" ? ICONS.chevronLeft : ICONS.chevronRight;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">' + icon + '</svg>';
+    return btn;
+  }
+
+  /** Injects scroll arrow buttons into each populated card row section. */
+  function setupRowArrows() {
+    document.querySelectorAll(".section-wrap[data-od-id]").forEach(section => {
+      const row = section.querySelector(".card-row");
+      if (!row || !row.children.length) return;
+
+      const leftBtn = createArrow("left", "Scroll left");
+      const rightBtn = createArrow("right", "Scroll right");
+      section.appendChild(leftBtn);
+      section.appendChild(rightBtn);
+
+      arrowState.push({ row, leftBtn, rightBtn });
+
+      function getStep() {
+        const first = row.querySelector(".media-card");
+        if (!first) return row.clientWidth * 0.8;
+        return first.offsetWidth + getGap(row);
+      }
+
+      leftBtn.addEventListener("click", () => {
+        row.scrollBy({ left: -getStep(), behavior: "smooth" });
+      });
+      rightBtn.addEventListener("click", () => {
+        row.scrollBy({ left: getStep(), behavior: "smooth" });
+      });
+
+      const update = () => updateArrowVisibility(row, leftBtn, rightBtn);
+      row.addEventListener("scroll", update, { passive: true });
+      update();
+
+      window.addEventListener("resize", update);
+    });
+  }
+
+  /** Refreshes visibility for all arrow instances (e.g., after content changes). */
+  function refreshArrows() {
+    arrowState.forEach(({ row, leftBtn, rightBtn }) => {
+      updateArrowVisibility(row, leftBtn, rightBtn);
+    });
+  }
+
+  /* ========================================================================
    * DATA LOADING
    * ======================================================================== */
   async function loadMovies() {
@@ -207,12 +279,13 @@
         const genre = chip.textContent.trim();
         if (genre === "All") {
           populateRow(DOM.moviesRow, state.moviesCache);
-          return;
+        } else {
+          const filtered = state.moviesCache.filter(
+            item => item.genres && item.genres.some(g => g.toLowerCase() === genre.toLowerCase())
+          );
+          populateRow(DOM.moviesRow, filtered);
         }
-        const filtered = state.moviesCache.filter(
-          item => item.genres && item.genres.some(g => g.toLowerCase() === genre.toLowerCase())
-        );
-        populateRow(DOM.moviesRow, filtered);
+        refreshArrows();
       });
     });
   }
@@ -240,6 +313,7 @@
     resetSlideTimer();
     try {
       await Promise.all([loadMovies(), loadSeries()]);
+      setupRowArrows();
     } catch (e) {
       console.warn("Flixsy: Trending API unavailable", e);
     }
