@@ -133,6 +133,13 @@ import mimetypes
 mimetypes.add_type("text/css", ".css", True)
 
 # [CAMBIO] Almacenamiento optimizado de WhiteNoise para compresión y versionado de CSS/JS
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    "default": {
+        "BACKEND": "django.db.backends.sqlite3", # O la base de datos que uses
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
