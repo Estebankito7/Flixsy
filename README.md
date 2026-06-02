@@ -1,13 +1,12 @@
 # Flixsy
 
-Movie discovery platform with real-time data from RapidAPI IMDB.
+Movie & TV discovery platform with real-time data from TMDB and multi-server video playback.
 
 ## Tech Stack
 
 - **Backend:** Django 6.0, Python 3.14
 - **API Client:** `requests` with session reuse & error handling
-- **Caching:** Django cache framework (15 min TTL)
-- **External API:** [RapidAPI IMDB236](https://rapidapi.com/Glavier/api/imdb236)
+- **External API:** [TMDB v3](https://developer.themoviedb.org/)
 - **Frontend:** Vanilla JS, CSS custom properties, responsive layout
 
 ## Setup
@@ -25,7 +24,7 @@ source venv/bin/activate   # macOS/Linux
 pip install django requests python-dotenv
 
 # Environment variables
-cp .env.example .env       # then fill in your RapidAPI key
+cp .env.example .env       # then fill in your TMDB API key
 
 # Run migrations
 python manage.py migrate
@@ -38,83 +37,86 @@ python manage.py runserver
 
 | Variable | Required | Description |
 |---|---|---|
-| `RAPIDAPI_HOST` | Yes | IMDB API host (e.g. `imdb236.p.rapidapi.com`) |
-| `RAPIDAPI_KEY` | Yes | Your RapidAPI subscription key |
+| `TMDB_API_KEY` | Yes | Your TMDB API v3 key |
 
 ## Architecture
 
-### Service Layer (`core/services.py`)
+### Service Layer (`core/tmdb.py`)
 
-The `IMDBClient` class encapsulates all RapidAPI communication:
+The `TMDBClient` class encapsulates all TMDB API communication:
 
-- **`fetch_movies()`** — Gets titles for a specific cast member
-- **`fetch_movie_by_id(imdb_id)`** — Single movie lookup with fallback
-- **`fetch_popular(media_type)`** — Most-popular movies or TV
-- **`search(query)`** — Full-text search against cached catalog + API
+- **`fetch_trending()`** — Trending movies/TV with IMDB ID enrichment
+- **`fetch_by_genre()`** — Discover movies/TV by genre via `/discover`
+- **`fetch_movie_by_id()`** — Single movie detail with credits
+- **`fetch_tv_by_id()`** — Single TV show detail with seasons & credits
+- **`find_by_external_id()`** — Resolve IMDB ID to TMDB data
+- **`search_all()`** — Full-text search across movies and TV
 
-Uses `requests.Session` for connection reuse and has built-in auth error handling.
+Uses `requests.Session` for connection reuse, genre ID→name caching, and concurrent IMDB ID enrichment via `ThreadPoolExecutor`.
 
 ### Views (`core/views.py`)
 
-Thin view layer that delegates to `IMDBClient` and Django cache:
+Thin view layer delegating to `TMDBClient`:
 
 | Route | View | Description |
 |---|---|---|
-| `/` | `HomeView` | Landing page with hero carousel + media rows |
-| `/item/<pk>/` | `movie_detail` | Detail by internal primary key |
-| `/detail/<imdb_id>/` | `movie_detail_imdb` | Detail by IMDB ID |
+| `/` | `HomeView` | Landing page with hero carousel + trending rows |
+| `/api/trending/` | `trending_api` | JSON trending (supports `?genre=` for discover) |
+| `/detail/<imdb_id>/` | `movie_detail_imdb` | Detail page with poster, meta, sidebar |
 | `/api/detail/<imdb_id>/` | `movie_api_json` | JSON endpoint for detail.js |
 | `/search/` | `search_results` | Search results page |
 | `/search/api/` | `search_api` | Search JSON endpoint |
+| `/saved/` | `saved_list` | Saved watchlist page (client-side localStorage) |
 
-### Caching
+### Frontend — Home (`core/static/core/js/home.js`)
 
-- **Movies list** — 15 min TTL, key `peliculas_cache`
-- **Search catalog** — 15 min TTL, key `search_catalog`
-- Falls back to empty list on API failure
+- **Hero carousel** — Auto-rotating slideshow with dots navigation
+- **Trending rows** — Movies and TV series with horizontal scroll arrows
+- **Genre filtering** — Chip-based filter using TMDB Discover API (movies + TV)
+
+### Frontend — Detail (`core/static/core/js/detail.js`)
+
+- **Video player** — iframe-based player with server selector bar
+- **Streaming servers:** MoviesApi, VidSrc, VidLink, VidFast
+- **Season/Episode selector** — Dynamic dropdown for TV series
+- **Save/Unsave** — localStorage watchlist toggle
 
 ### Templates
 
 | Template | Description |
 |---|---|
 | `core/home.html` | Landing with hero carousel, genre chips, movie/TV rows |
-| `core/detail.html` | Movie/show detail with poster, meta, sidebar, video player |
+| `core/detail.html` | Detail page with poster, meta, sidebar, video player |
 | `core/search_results.html` | Search query results grid |
-
-### Static Assets
-
-| File | Description |
-|---|---|
-| `core/style.css` | Global styles, layout, navigation, hero, cards |
-| `core/css/detail.css` | Detail page styles (backdrop, poster, player) |
-| `core/js/detail.js` | Client-side: video player, server switching, API enrichment |
+| `core/saved.html` | Saved watchlist from localStorage |
 
 ## Project Structure
 
 ```
 Flixsy/
 ├── config/                 # Django project configuration
-│   ├── settings.py
-│   ├── urls.py
-│   ├── asgi.py
-│   └── wsgi.py
+│   └── settings.py
 ├── core/                   # Main application
-│   ├── services.py         # IMDBClient API service
+│   ├── tmdb.py             # TMDBClient API service
 │   ├── views.py            # All view functions/classes
 │   ├── models.py           # Item model
 │   ├── urls.py             # App URL routing
-│   ├── admin.py            # Admin registration
-│   ├── migrations/
 │   ├── static/core/
-│   │   ├── style.css
-│   │   ├── css/detail.css
-│   │   └── js/detail.js
+│   │   ├── css/
+│   │   │   ├── base.css
+│   │   │   └── detail.css
+│   │   ├── js/
+│   │   │   ├── home.js
+│   │   │   ├── detail.js
+│   │   │   └── saved.js
+│   │   └── style.css
 │   └── templates/core/
 │       ├── home.html
 │       ├── detail.html
-│       └── search_results.html
+│       ├── search_results.html
+│       └── saved.html
 ├── manage.py
 ├── pyproject.toml
-├── .env                    # (not tracked — add your keys)
+├── .env                    # (not tracked — add your key)
 └── .gitignore
 ```

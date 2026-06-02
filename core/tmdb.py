@@ -70,6 +70,22 @@ class TMDBClient:
     def __init__(self, config: TMDBConfig | None = None) -> None:
         self.config = config or TMDBConfig()
         self._session = requests.Session()
+        self._genre_cache: dict[str, dict[int, str]] | None = None
+
+    def _load_genre_map(self, media_type: str = "movie") -> dict[int, str]:
+        if self._genre_cache is None:
+            self._genre_cache = {}
+        if media_type in self._genre_cache:
+            return self._genre_cache[media_type]
+        mapping: dict[int, str] = {}
+        try:
+            resp = self._get(f"genre/{media_type}/list", {"language": "en"})
+            for g in resp.json().get("genres", []):
+                mapping[g["id"]] = g["name"]
+        except requests.RequestException:
+            pass
+        self._genre_cache[media_type] = mapping
+        return mapping
 
     def _raise_for_auth(self, response: requests.Response) -> None:
         if response.status_code in (401, 403):
@@ -112,9 +128,12 @@ class TMDBClient:
         return cleaned
 
     def _normalize_trending(self, item: dict) -> dict:
+        genre_ids = item.get("genre_ids", [])
+        mtype = item.get("media_type", "movie")
+        genre_map = self._load_genre_map(mtype)
         return {
             "id": item.get("id"),
-            "media_type": item.get("media_type", "movie"),
+            "media_type": mtype,
             "primaryImage": (
                 f"{POSTER_BASE_URL}{item['poster_path']}"
                 if item.get("poster_path") else None
@@ -125,7 +144,7 @@ class TMDBClient:
                 item["release_date"][:4]
                 if item.get("release_date") else None
             ),
-            "genres": [],
+            "genres": [genre_map.get(gid) for gid in genre_ids if genre_map.get(gid)],
             "description": item.get("overview", ""),
         }
 
@@ -161,6 +180,39 @@ class TMDBClient:
             response = self._get(f"trending/{media_type}/{time_window}", {"page": str(page)})
             data = response.json()
             items = [self._normalize_trending(item) for item in data.get("results", [])]
+            if enrich:
+                items = self._enrich_with_imdb_ids(items)
+            return items
+        except requests.RequestException:
+            return []
+
+    def fetch_by_genre(self, media_type: str, genre_name: str, page: int = 1, enrich: bool = True) -> list[dict]:
+        tmdb_type = "movie" if media_type == "movie" else "tv"
+        genre_map = self._load_genre_map(tmdb_type)
+        genre_aliases = {
+            "sci-fi": "Science Fiction" if tmdb_type == "movie" else "Sci-Fi & Fantasy",
+            "action": "Action" if tmdb_type == "movie" else "Action & Adventure",
+            "thriller": "Thriller" if tmdb_type == "movie" else "Thriller",
+        }
+        search_name = genre_aliases.get(genre_name.lower(), genre_name)
+        genre_id = None
+        for gid, gname in genre_map.items():
+            if gname.lower() == search_name.lower():
+                genre_id = gid
+                break
+        if not genre_id:
+            return []
+        try:
+            response = self._get(f"discover/{tmdb_type}", {
+                "with_genres": str(genre_id),
+                "sort_by": "popularity.desc",
+                "page": str(page),
+            })
+            data = response.json()
+            items = []
+            for item in data.get("results", []):
+                item["media_type"] = tmdb_type
+                items.append(self._normalize_trending(item))
             if enrich:
                 items = self._enrich_with_imdb_ids(items)
             return items
@@ -249,6 +301,24 @@ class TMDBClient:
             ]
         return result
 
+    def _normalize_search_result(self, item: dict, media_type: str = "movie") -> dict:
+        return {
+            "id": item.get("id"),
+            "titulo": item.get("title") or item.get("name") or "",
+            "imagen": (
+                f"{POSTER_BASE_URL}{item['poster_path']}"
+                if item.get("poster_path") else None
+            ),
+            "calificacion": item.get("vote_average"),
+            "año": (
+                (item.get("release_date") or item.get("first_air_date") or "")[:4]
+                if (item.get("release_date") or item.get("first_air_date")) else None
+            ),
+            "generos": [],
+            "resumen": item.get("overview", ""),
+            "media_type": media_type,
+        }
+
     def search_movies(self, query: str, page: int = 1) -> list[dict]:
         cleaned = self._clean_query(query)
         if not cleaned:
@@ -259,6 +329,34 @@ class TMDBClient:
             results = data.get("results", [])
             if not results:
                 return []
-            return [self._normalize_movie(item) for item in results]
+            return [self._normalize_search_result(item, "movie") for item in results]
         except requests.RequestException:
             return []
+
+    def search_tv(self, query: str, page: int = 1) -> list[dict]:
+        cleaned = self._clean_query(query)
+        if not cleaned:
+            return []
+        try:
+            response = self._get("search/tv", {"query": cleaned, "page": str(page)})
+            data = response.json()
+            results = data.get("results", [])
+            if not results:
+                return []
+            return [self._normalize_search_result(item, "tv") for item in results]
+        except requests.RequestException:
+            return []
+
+    def search_all(self, query: str, page: int = 1) -> list[dict]:
+        import concurrent.futures
+        cleaned = self._clean_query(query)
+        if not cleaned:
+            return []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+            movie_future = pool.submit(self.search_movies, cleaned, page)
+            tv_future = pool.submit(self.search_tv, cleaned, page)
+            movies = movie_future.result()
+            tv = tv_future.result()
+        merged = (movies or []) + (tv or [])
+        merged.sort(key=lambda x: x.get("calificacion", 0) or 0, reverse=True)
+        return merged
