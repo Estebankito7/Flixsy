@@ -27,25 +27,38 @@ def trending_api(request: HttpRequest) -> JsonResponse:
     media_type = request.GET.get("media_type", "movie")
     time_window = request.GET.get("time_window", "day")
     page = int(request.GET.get("page", "1"))
-    results = tmdb.fetch_trending(media_type, time_window, page)
+    genre = request.GET.get("genre")
+    if genre:
+        results = tmdb.fetch_by_genre(media_type, genre, page)
+    else:
+        results = tmdb.fetch_trending(media_type, time_window, page)
     return JsonResponse({"results": results})
 
 
-def _resolve_movie(identifier: str) -> dict | None:
+def _resolve_movie(identifier: str, media_type: str | None = None) -> dict | None:
     if identifier.startswith("tt"):
         return tmdb.find_by_external_id(identifier)
     try:
         pk = int(identifier)
+        if media_type == "tv":
+            return tmdb.fetch_tv_by_id(pk)
+        if media_type == "movie":
+            return tmdb.fetch_movie_by_id(pk)
         movie = tmdb.fetch_movie_by_id(pk)
         return movie if movie else tmdb.fetch_tv_by_id(pk)
     except ValueError:
         return None
 
 
-def movie_detail(request: HttpRequest, pk: int) -> HttpResponse:
-    movie = tmdb.fetch_movie_by_id(pk)
-    if not movie:
+def movie_detail(request: HttpRequest, pk: int, media_type: str | None = None) -> HttpResponse:
+    if media_type == "tv":
         movie = tmdb.fetch_tv_by_id(pk)
+    elif media_type == "movie":
+        movie = tmdb.fetch_movie_by_id(pk)
+    else:
+        movie = tmdb.fetch_movie_by_id(pk)
+        if not movie:
+            movie = tmdb.fetch_tv_by_id(pk)
     if not movie:
         raise Http404("Movie not found")
     return render(request, "core/detail.html", {"movie": movie})
@@ -72,7 +85,7 @@ def movie_api_json(request: HttpRequest, imdb_id: str) -> JsonResponse:
 @require_GET
 def search_results(request: HttpRequest) -> HttpResponse:
     q = request.GET.get("q", "").strip()
-    results = tmdb.search_movies(q) if q else []
+    results = tmdb.search_all(q) if q else []
     return render(request, "core/search_results.html", {
         "query": q,
         "results": results,
@@ -82,7 +95,7 @@ def search_results(request: HttpRequest) -> HttpResponse:
 @require_GET
 def search_api(request: HttpRequest) -> JsonResponse:
     q = request.GET.get("q", "").strip()
-    results = tmdb.search_movies(q) if q else []
+    results = tmdb.search_all(q) if q else []
     return JsonResponse({"results": results, "query": q})
 
 

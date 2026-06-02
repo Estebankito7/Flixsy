@@ -6,6 +6,7 @@ app_name = "core"
 
 urlpatterns = [
     path("", views.HomeView.as_view(), name="home"),
+    path("item/<int:pk>/<str:media_type>/", views.movie_detail, name="movie-detail-typed"),
     path("item/<int:pk>/", views.movie_detail, name="movie-detail"),
     path("detail/<str:imdb_id>/", views.movie_detail_imdb, name="movie-detail-imdb"),
     path("api/detail/<str:imdb_id>/", views.movie_api_json, name="movie-api-json"),

@@ -271,6 +271,16 @@
   /* ========================================================================
    * GENRE FILTERING
    * ======================================================================== */
+  async function loadByGenre(mediaType, genre, container) {
+    const url = `${API.TRENDING}?media_type=${mediaType}&genre=${encodeURIComponent(genre)}`;
+    try {
+      const data = await fetchFromDjango(url);
+      populateRow(container, data.results || []);
+    } catch {
+      populateRow(container, []);
+    }
+  }
+
   function setupGenreFiltering() {
     DOM.genreChips.forEach(chip => {
       chip.addEventListener("click", () => {
@@ -278,12 +288,11 @@
         chip.classList.add("active");
         const genre = chip.textContent.trim();
         if (genre === "All") {
-          populateRow(DOM.moviesRow, state.moviesCache);
+          loadMovies();
+          loadSeries();
         } else {
-          const filtered = state.moviesCache.filter(
-            item => item.genres && item.genres.some(g => g.toLowerCase() === genre.toLowerCase())
-          );
-          populateRow(DOM.moviesRow, filtered);
+          loadByGenre("movie", genre, DOM.moviesRow);
+          loadByGenre("tv", genre, DOM.seriesRow);
         }
         refreshArrows();
       });
